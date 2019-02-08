@@ -1,0 +1,46 @@
+
+parent.0 = ../../gnp/gnp.params
+
+#
+# We specify our problem here
+#
+
+eval.problem = ec.app.ant.AntGnp
+
+# Here we determine what kind of Ant we're doing:
+
+# 400 moves, Santa Fe trail
+eval.problem.moves = 400
+eval.problem.file = santafe.trl
+
+# Node count
+# ==============================
+gnp.judgementNodeCount = 10
+gnp.processingNodeCount = 10
+gnp.maxTime = 60
+gnp.judgementTime = 3
+gnp.processingTime = 10
+
+
+# Subnode setup
+# ==============================
+gnp.maxSubnodeCount = 2
+
+# Function setup
+# ==============================
+gnp.judgementFunction.count = 1
+gnp.judgementFunction.0 = ec.app.ant.gnpfunc.IfFoodAhead
+gnp.processingFunction.count = 3
+#gnp.processingFunction.0 = ec.app.ant.gnpfunc.Move
+# no reason to use delayed reward  - just to demonstrate the functionality
+gnp.processingFunction.0 = ec.app.ant.gnpfunc.DelayedRewardMove
+gnp.processingFunction.1 = ec.app.ant.gnpfunc.Left
+gnp.processingFunction.2 = ec.app.ant.gnpfunc.Right
+
+#pop.subpop.0.size = 10000
+
+stat.file = $out_gnp_ant.stat
+
+stat.do-per-generation-description = false
+
+gnp.storeAllExecPaths = false

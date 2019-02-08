@@ -1,0 +1,97 @@
+# Parent:
+parent.0 = ../simple/simple.params
+
+# Initializer
+# ==============================
+init = ec.gnp.GnpInitializer
+
+# Species
+# ==============================
+pop.subpop.0.species = ec.vector.FloatVectorSpecies
+
+# Nodes
+gnp.node = ec.gnp.GnpNode
+gnp.subNode = ec.gnp.GnpSubnode
+
+# Individual
+# ==============================
+pop.subpop.0.species.ind = ec.gnp.GnpIndividual
+
+# Store all execution paths of the individual - might impact performance a lot
+gnp.storeAllExecPaths = false
+
+# Node count
+# ==============================
+gnp.judgementNodeCount = 5
+gnp.processingNodeCount = 2
+gnp.maxTime = 5
+gnp.judgementTime = 1
+gnp.processingTime = 5
+gnp.startWithJudgement = false
+
+# Subnode setup
+# ==============================
+gnp.maxSubnodeCount = 2
+
+# Subnode selector
+# ==============================
+# E-greedy function selection
+gnp.subnodeSelection = ec.gnp.selection.GnpEgreedy
+gnp.subnodeSelection.eGreedy.epsilon = 0.1
+
+# Subnode parameter gene boundries and mutations are set explicitly within a custom extended class (only int and double genes are supported)
+gnp.subnodeParameters.count = 0
+gnp.subnodeParameters.0 = ?
+gnp.subnodeParameters.1 = ?
+
+# Reward distribution class
+gnp.rewardDistributor = ec.gnp.sarsa.GnpSarsaWithEligibilityTraces
+#gnp.rewardDistributor = ec.gnp.sarsa.GnpSarsa
+# The learning rate (alpha) determines to what extent the newly acquired information will override the old information. A factor of 0 will make the agent not learn anything, while a factor of 1 would make the agent consider only the most recent information.
+gnp.rewardDistributor.sarsa.alpha = 0.1
+# The discount factor (gamma) determines the importance of future rewards. A factor of 0 will make the agent "opportunistic" by only considering current rewards, while a factor approaching 1 will make it strive for a long-term high reward. If the discount factor meets or exceeds 1, the Q values may diverge.
+gnp.rewardDistributor.sarsa.gamma = 0.3
+# Traces-decay parameter - used only in GnpSarsaWithEligibilityTraces
+gnp.rewardDistributor.sarsa.lambda = 0.8
+
+# Mutation setup
+# globals will be anyway reset by per-segment setup, this is just to make error disappear
+vector.species.mutation-type = reset
+
+# GnpIndividual is based on DoubleVectorIndividual, so it supports the same mutations according to the type of the gene, i.e. in case of fixed nodes - only integers
+# Gene mutations are set based on custom segments:
+# gnp.subnodeCountSegment
+# gnp.subnodeFunctionIdSegment
+# gnp.connectionsSegment
+# these segments will be replaced by parameter "vector.species.segment.x" so all the parameters segments support, are supported
+# ==============================
+gnp.subnodeCountSegment.mutation-type = integer-random-walk
+gnp.subnodeCountSegment.mutation-bounded = true
+gnp.subnodeCountSegment.mutation-prob = 0.1
+gnp.subnodeCountSegment.random-walk-probability = 0.5
+gnp.subnodeFunctionIdSegment.mutation-type = integer-reset
+gnp.subnodeFunctionIdSegment.mutation-prob = 0.1
+gnp.connectionsSegment.mutation-type = integer-random-walk
+gnp.connectionsSegment.mutation-bounded = true
+gnp.connectionsSegment.mutation-prob = 0.1
+gnp.connectionsSegment.random-walk-probability = 0.1
+
+# Function setup
+# ==============================
+gnp.judgementFunction.count = 0
+gnp.judgementFunction.0 = ?
+gnp.processingFunction.count = 0
+gnp.processingFunction.0 = ?
+
+# Evo setup
+vector.species.fitness = ec.simple.SimpleFitness
+vector.species.crossover-type = one
+
+pop.subpop.0.species.pipe = ec.vector.breed.VectorMutationPipeline
+pop.subpop.0.species.pipe.source.0 = ec.vector.breed.VectorCrossoverPipeline
+pop.subpop.0.species.pipe.source.0.source.0 = ec.select.TournamentSelection
+pop.subpop.0.species.pipe.source.0.source.1 = same
+
+select.tournament.size = 7
+pop.subpop.0.species.mutation-prob = 0.1
+pop.subpop.0.species.crossover-type = one

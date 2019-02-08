@@ -1,0 +1,38 @@
+# Parent:
+parent.0 = ../../../../main/resources/ec/gnp/gnp.params
+
+eval.problem = ec.gnp.implementations.GnpTestProblem
+
+# Node count
+# ==============================
+gnp.judgementNodeCount = 5
+gnp.processingNodeCount = 2
+gnp.maxTime = 10
+gnp.judgementTime = 1
+gnp.processingTime = 5
+
+# Subnode setup
+# ==============================
+gnp.maxSubnodeCount = 2
+
+gnp.subnodeParameters.count = 2
+gnp.subnodeParameters.0 = ec.gnp.implementations.GnpTwoIntegerGenesSubnodeParameter
+gnp.subnodeParameters.1 = ec.gnp.implementations.GnpIntegerAndDoubleGenesSubnodeParameter
+
+# Reward distribution class
+gnp.rewardDistributor = ec.gnp.sarsa.GnpSarsa
+
+pop.subpop.0.size = 10
+
+# print-params = true
+
+gnp.judgementFunction.count = 4
+gnp.judgementFunction.0 = ec.gnp.implementations.GnpJudgementFunction
+gnp.judgementFunction.1 = ec.gnp.implementations.GnpJudgementFunction
+gnp.judgementFunction.2 = ec.gnp.implementations.GnpJudgementFunction
+gnp.judgementFunction.3 = ec.gnp.implementations.GnpJudgementFunction
+gnp.processingFunction.count = 3
+# functions for immediate reward setting tests
+gnp.processingFunction.0 = ec.gnp.implementations.GnpProcessingFunction
+gnp.processingFunction.1 = ec.gnp.implementations.GnpProcessingFunction
+gnp.processingFunction.2 = ec.gnp.implementations.GnpProcessingFunction

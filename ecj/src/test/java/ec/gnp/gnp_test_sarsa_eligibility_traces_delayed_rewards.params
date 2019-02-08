@@ -1,0 +1,10 @@
+# Parent:
+parent.0 = gnp_test.params
+
+# functions for delayed reward setting tests
+gnp.rewardDistributor = ec.gnp.sarsa.GnpSarsaWithEligibilityTraces
+
+# functions for delayed reward setting tests
+gnp.processingFunction.0 = ec.gnp.implementations.GnpProcessingFunctionDelayedReward
+gnp.processingFunction.1 = ec.gnp.implementations.GnpProcessingFunctionDelayedReward
+gnp.processingFunction.2 = ec.gnp.implementations.GnpProcessingFunctionDelayedReward

@@ -461,6 +461,10 @@ public class ParameterDatabase implements Serializable
 
     // the parents of this database
     Vector parents;
+
+    public Vector getParents() {
+            return parents;
+        }
     
     // If the database was loaded via a file, this holds the directory of the database
     File directory;
@@ -478,6 +482,10 @@ public class ParameterDatabase implements Serializable
     String relativePath;
 
     Properties properties;
+
+    public Properties getProperties() {
+            return properties;
+        }
 
     /**
      * Searches down through databases to find a given parameter, whose value
