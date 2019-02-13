@@ -51,9 +51,7 @@ public class GnpGeneDescriptor implements Serializable {
             additionalParameters.put(new String(entry.getKey()), new String(entry.getValue()));
         }
 
-        GnpGeneDescriptor newObj = new GnpGeneDescriptor(this.basicType, additionalParameters);
-
-        return newObj;
+        return new GnpGeneDescriptor(this.basicType, additionalParameters);
     }
 
     private Class getBasicType() {

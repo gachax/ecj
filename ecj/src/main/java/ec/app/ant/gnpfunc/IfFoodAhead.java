@@ -1,6 +1,7 @@
 package ec.app.ant.gnpfunc;
 
 import ec.EvolutionState;
+import ec.Problem;
 import ec.app.ant.AntGnp;
 import ec.gnp.*;
 
@@ -16,7 +17,7 @@ public class IfFoodAhead extends GnpFunction {
     public GnpFunctionResult evaluate(final EvolutionState state,
                                          final int thread,
                                          final GnpIndividual individual,
-                                         final Integer evaluationId,
+                                         final int evaluationId,
                                          final List<GnpSubnodeParameter> parameters,
                                          Object ... additionalParameters) {
 

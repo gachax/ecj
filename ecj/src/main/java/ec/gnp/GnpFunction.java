@@ -1,7 +1,6 @@
 package ec.gnp;
 
 import ec.EvolutionState;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ public abstract class GnpFunction {
     public abstract GnpFunctionResult evaluate(final EvolutionState state,
                                                   final int thread,
                                                   final GnpIndividual individual,
-                                                  final Integer evaluationId,
+                                                  final int evaluationId,
                                                   final List<GnpSubnodeParameter> parameters,
                                                   Object ... additionalParameters);
 

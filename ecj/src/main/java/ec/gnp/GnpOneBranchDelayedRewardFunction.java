@@ -5,7 +5,7 @@ package ec.gnp;
  *
  * @author Gatis Birkens
  */
-public abstract class GnpOneBranchDelayedRewardFunction extends GnpDelayedRewardFunction {
+public abstract class GnpOneBranchDelayedRewardFunction extends GnpDelayedRewardFunction{
 
     public static final String DEFAULT_BRANCH_NAME = "n";
 

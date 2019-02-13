@@ -11,18 +11,21 @@ import ec.EvolutionState;
 import ec.Individual;
 import ec.Problem;
 import ec.gnp.*;
+import ec.gnp.selection.GnpEgreedy;
+import ec.gnp.selection.GnpSubnodeSelector;
 import ec.simple.SimpleFitness;
 import ec.simple.SimpleProblemForm;
 import ec.util.Parameter;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /* 
  * Ant.java
@@ -113,7 +116,7 @@ public class AntGnp extends Problem implements SimpleProblemForm
     public int pmod;
 
     //For testing delayed reward functionality of GNP, usually evaluationIds will not be stored on problem, but somewhere else where rewards are set from
-    public Map<Individual, List<Integer>> functionEvaluationIds = new HashMap<>();
+    public Object2ObjectOpenHashMap<Individual, IntArrayList> functionEvaluationIds = new Object2ObjectOpenHashMap<>();
 
     public Object clone()
         {
@@ -220,8 +223,8 @@ public class AntGnp extends Problem implements SimpleProblemForm
 
         }
 
-    public void evaluate(final EvolutionState state,
-        final Individual ind,
+    public void evaluate(final EvolutionState state, 
+        final Individual ind, 
         final int subpopulation,
         final int threadnum)
         {
@@ -291,8 +294,8 @@ public class AntGnp extends Problem implements SimpleProblemForm
         }
 
     public void describe(
-        final EvolutionState state,
-        final Individual ind,
+        final EvolutionState state, 
+        final Individual ind, 
         final int subpopulation, 
         final int threadnum,
         final int log)
@@ -313,16 +316,14 @@ public class AntGnp extends Problem implements SimpleProblemForm
 
         state.output.println("\n\nBest Individual's Stats\n=====================", log);
         ((GnpIndividual) ind).clearExecutionPaths();
-        state.output.println("Gnp network VS genome. Gene, Value of gene: details either about network connections of function with Q (learned) values." , log);
-        state.output.println(((GnpIndividual)ind).stringOutputGenomeVsNetwork(), log);
-        state.output.println("Network represented as graph:", log);
-        state.output.println(((GnpIndividual)ind).graphOutputNetwork(), log);
+         state.output.println(((GnpIndividual)ind).stringOutputGenomeVsNetwork(), log);
+        //state.output.println("", log);
+        //state.output.println(((GnpIndividual)ind).graphOutputNetwork(), log);
 
         int prevMoves = 0;
-        state.output.println("", log);
-        state.output.println("All the moves represented as graphs:", log);
         for(moves=0;moves<maxMoves && sum<food; ) {
             List<GnpNodeEvaluationResult> executionPath = (((GnpIndividual) ind).evaluateDontLearnDontExplore(state, threadnum, this));
+            //state.output.println("", log);
             //state.output.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath), log);
             state.output.println(((GnpIndividual)ind).graphOutputExecutionPath(executionPath), log);
             if (prevMoves == moves){
@@ -379,9 +380,9 @@ public class AntGnp extends Problem implements SimpleProblemForm
 
         private void setDelayedReward(Individual ind) {
             //if delayed reward is used, then set it
-            List<Integer> evalIds = functionEvaluationIds.get(ind);
+            IntArrayList evalIds = functionEvaluationIds.get(ind);
             if (evalIds != null && !evalIds.isEmpty()) {
-                for (Integer evalId : evalIds) {
+                for (int evalId : evalIds) {
                     ((GnpIndividual) ind).setDelayedReward(evalId, 1.0);
                 }
                 functionEvaluationIds.remove(ind);

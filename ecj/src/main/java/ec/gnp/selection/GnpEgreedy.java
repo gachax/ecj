@@ -3,8 +3,7 @@ package ec.gnp.selection;
 import ec.EvolutionState;
 import ec.gnp.GnpSubnode;
 import ec.util.Parameter;
-
-import java.util.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
  * Implementation of GnpSubnodeSelector. Selects the GnpSubnode to be evaluated by using epsilon greedy algorithm.
@@ -27,7 +26,7 @@ public class GnpEgreedy implements GnpSubnodeSelector{
      * @return
      */
     @Override
-    public GnpSubnode select(ArrayList<GnpSubnode> subnodes, int thread, boolean exploringEnabled, Double exploringProbability) {
+    public GnpSubnode select(ObjectArrayList<GnpSubnode> subnodes, int thread, boolean exploringEnabled, Double exploringProbability) {
 
         GnpSubnode resultingSubnode = null;
 

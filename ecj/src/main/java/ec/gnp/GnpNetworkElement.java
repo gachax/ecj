@@ -6,10 +6,22 @@ package ec.gnp;
  *
  * @author Gatis Birkens
  */
-public class GnpNetworkElement {
+public class GnpNetworkElement implements Cloneable {
 
-    protected Integer id;
+    protected int id = -1;
     protected int startGene;
     protected double[] genome;
+
+    public GnpNetworkElement lightClone(){
+
+        try {
+            return (GnpNetworkElement) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
 
 }

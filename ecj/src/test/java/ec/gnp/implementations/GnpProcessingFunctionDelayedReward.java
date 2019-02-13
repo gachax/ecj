@@ -1,10 +1,8 @@
 package ec.gnp.implementations;
 
 import ec.EvolutionState;
-import ec.gnp.GnpFunctionResult;
-import ec.gnp.GnpIndividual;
-import ec.gnp.GnpOneBranchDelayedRewardFunction;
-import ec.gnp.GnpSubnodeParameter;
+import ec.Problem;
+import ec.gnp.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -20,7 +18,7 @@ public class GnpProcessingFunctionDelayedReward extends GnpOneBranchDelayedRewar
     public GnpFunctionResult evaluate(EvolutionState state,
                                       int thread,
                                       GnpIndividual individual,
-                                      final Integer evaluationId,
+                                      final int evaluationId,
                                       List<GnpSubnodeParameter> parameters,
                                       Object ... additionalParameters) {
 

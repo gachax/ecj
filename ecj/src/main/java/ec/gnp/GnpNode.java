@@ -1,9 +1,9 @@
 package ec.gnp;
 
 import ec.EvolutionState;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,8 +20,8 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
 
     private int type;
     private int subnodeCount = -1;
-    private ArrayList<GnpSubnode> subnodes = new ArrayList<>(); //the list of subnodes
-    private ArrayList<GnpBranch> branches = new ArrayList<>(); //the list of branches
+    private ObjectArrayList<GnpSubnode> subnodes; //the list of subnodes
+    private ObjectArrayList<GnpBranch> branches; //the list of branches
     private GnpInitializer init;
     private EvolutionState state;
 
@@ -41,12 +41,14 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
         this.startGene = startGene;
         this.init = ((GnpInitializer) state.initializer);
         this.state = state;
+        subnodes = new ObjectArrayList<>();
+        branches = new ObjectArrayList<>();
 
     }
 
     public Object copy(double[] genome) {
 
-        GnpNode myobj = (GnpNode) state.parameters.getInstanceForParameter(init.defaultBase().push(P_NODE), null, GnpNetworkElement.class);
+        GnpNode myobj = init.newGnpNodeInstance();
 
         myobj.setup(this.id, genome, this.type, this.startGene, this.state);
 
@@ -106,15 +108,15 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
      * @param additionalParameters additional parameters passed from the Problem
      * @return GnpNodeEvaluationResult
      */
-    public GnpNodeEvaluationResult evaluate(final EvolutionState state,
-                                            GnpIndividual individual,
-                                            List<GnpNodeEvaluationResult> executionPath,
-                                            Integer totalEvaluationCount,
-                                            int thread,
-                                            boolean learn,
-                                            boolean explore,
-                                            Double exploringProbability,
-                                            Object ... additionalParameters) {
+    public GnpNodeEvaluationResult evaluate( final EvolutionState state,
+                                             GnpIndividual individual,
+                                             ObjectArrayList<GnpNodeEvaluationResult> executionPath,
+                                             Integer totalEvaluationCount,
+                                             int thread,
+                                             boolean learn,
+                                             boolean explore,
+                                             Double exploringProbability,
+                                             Object ... additionalParameters) {
 
         GnpSubnode subnode = init.getSubnodeSelector().select(subnodes, thread, explore, exploringProbability);
 
@@ -172,7 +174,7 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
 
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -180,11 +182,11 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
         return type;
     }
 
-    public ArrayList<GnpSubnode> getSubnodes() {
+    public ObjectArrayList<GnpSubnode> getSubnodes() {
         return subnodes;
     }
 
-    public ArrayList<GnpBranch> getBranches() {
+    public ObjectArrayList<GnpBranch> getBranches() {
         return branches;
     }
 

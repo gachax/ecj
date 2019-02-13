@@ -15,7 +15,7 @@ public class GnpNodeEvaluationResult {
 
     private GnpNode evaluatedNode;
 
-    private Integer evaluationId;
+    private int evaluationId;
 
     private Integer branchId;
 
@@ -48,11 +48,11 @@ public class GnpNodeEvaluationResult {
         this.evaluatedNode = evaluatedNode;
     }
 
-    public void setEvaluationId(Integer evaluationId) {
+    public void setEvaluationId(int evaluationId) {
         this.evaluationId = evaluationId;
     }
 
-    public Integer getEvaluationId() {
+    public int getEvaluationId() {
         return evaluationId;
     }
 

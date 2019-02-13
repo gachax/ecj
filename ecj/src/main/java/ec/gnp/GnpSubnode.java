@@ -1,21 +1,21 @@
 package ec.gnp;
 
 import ec.EvolutionState;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class GnpSubnode extends GnpNetworkElement implements Serializable {
 
     public static final String P_SUB_NODE = "subNode";
     private int functionId = -1;
-    private Double Q = 0.0;
+    private double Q = 0.0;
     protected int nodeType;
-    private ArrayList<GnpSubnodeParameter> subnodeParameters = new ArrayList<>();
+    private ObjectArrayList<GnpSubnodeParameter> subnodeParameters;
     private EvolutionState state;
     private GnpInitializer init;
 
-    public void setup (Integer nodeType, int id, double[] genome, int startGene, final EvolutionState state, Double Q) {
+    public void setup (Integer nodeType, int id, double[] genome, int startGene, final EvolutionState state, double Q) {
 
         this.id = id;
         this.genome = genome;
@@ -23,15 +23,15 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
         this.nodeType = nodeType;
         this.state = state;
         this.init = ((GnpInitializer) state.initializer);
-        if (Q != null) {
-            this.Q = Q;
-        }
+        this.Q = Q;
+
+        subnodeParameters = new ObjectArrayList<>();
 
     }
 
     public Object copy(double[] genome) {
 
-        GnpSubnode myobj = (GnpSubnode) state.parameters.getInstanceForParameter(init.defaultBase().push(P_SUB_NODE), null, GnpNetworkElement.class);
+        GnpSubnode myobj = init.newGnpSubnodeInstance();
 
         myobj.setup(this.nodeType, this.id, genome, this.startGene, this.state, this.Q);
 
@@ -65,7 +65,7 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
 
     }
 
-    public ArrayList<GnpSubnodeParameter> getSubnodeParameters() {
+    public ObjectArrayList<GnpSubnodeParameter> getSubnodeParameters() {
         return subnodeParameters;
     }
 
@@ -73,11 +73,11 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
         return id;
     }
 
-    public Double getQ() {
+    public double getQ() {
         return Q;
     }
 
-    public void setQ(Double q) {
+    public void setQ(double q) {
         Q = q;
     }
 

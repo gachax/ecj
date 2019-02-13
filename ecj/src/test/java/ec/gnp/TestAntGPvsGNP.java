@@ -6,6 +6,7 @@ import ec.util.Output;
 import ec.util.ParameterDatabase;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -46,7 +47,7 @@ public class TestAntGPvsGNP {
     }
 
     @Test
-    //@Ignore
+    @Ignore
     public void runAntGp(){
 
         antGpState.run(EvolutionState.C_STARTED_FRESH);

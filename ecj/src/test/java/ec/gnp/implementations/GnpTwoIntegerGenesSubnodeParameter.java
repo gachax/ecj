@@ -1,11 +1,10 @@
 package ec.gnp.implementations;
 
-import ec.gnp.GnpGeneDescriptor;
 import ec.gnp.GnpInitializer;
 import ec.gnp.GnpSubnodeParameter;
+import ec.gnp.GnpGeneDescriptor;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class GnpTwoIntegerGenesSubnodeParameter extends GnpSubnodeParameter {
 

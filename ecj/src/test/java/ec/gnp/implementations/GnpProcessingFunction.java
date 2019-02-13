@@ -1,10 +1,8 @@
 package ec.gnp.implementations;
 
 import ec.EvolutionState;
-import ec.gnp.GnpFunctionResult;
-import ec.gnp.GnpIndividual;
-import ec.gnp.GnpOneBranchFunction;
-import ec.gnp.GnpSubnodeParameter;
+import ec.Problem;
+import ec.gnp.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -20,7 +18,7 @@ public class GnpProcessingFunction extends GnpOneBranchFunction implements Seria
     public GnpFunctionResult evaluate(final EvolutionState state,
                                       final int thread,
                                       final GnpIndividual individual,
-                                      final Integer evaluationId,
+                                      final int evaluationId,
                                       final List<GnpSubnodeParameter> parameters,
                                       Object ... additionalParameters) {
 

@@ -5,19 +5,22 @@ import ec.Evolve;
 import ec.Individual;
 import ec.gnp.implementations.GnpIntegerAndDoubleGenesSubnodeParameter;
 import ec.gnp.implementations.GnpTwoIntegerGenesSubnodeParameter;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import org.junit.*;
 import ec.util.Output;
 import ec.util.Parameter;
 import ec.util.ParameterDatabase;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestGnp {
 
@@ -180,9 +183,9 @@ public class TestGnp {
             GnpInitializer initializer = (GnpInitializer) state.initializer;
 
             Map<Integer, int[]> nodeGeneMap = ((GnpInitializer) state.initializer).getNodeGeneMap();
-            Map<String, int[]> subnodeGeneMap = ((GnpInitializer) state.initializer).getSubnodeGeneMap();
-            Map<String, int[]> subnodeParamsGeneMap = ((GnpInitializer) state.initializer).getSubnodeParamsGeneMap();
-            Map<String, int[]> branchGeneMap = ((GnpInitializer) state.initializer).getBranchesGeneMap();
+            Map<Integer, int[]> subnodeGeneMap = ((GnpInitializer) state.initializer).getSubnodeGeneMap();
+            Map<Integer, int[]> subnodeParamsGeneMap = ((GnpInitializer) state.initializer).getSubnodeParamsGeneMap();
+            Map<Integer, int[]> branchGeneMap = ((GnpInitializer) state.initializer).getBranchesGeneMap();
 
             for (int n = 0; n < 7; n++) {
 
@@ -296,7 +299,7 @@ public class TestGnp {
 
     }
 
-    private List<GnpNodeEvaluationResult> makeSureAtLeastOneNotFirstProcessingNode(GnpIndividual ind, List<GnpNodeEvaluationResult> executionPath, EvolutionState state) {
+    private ObjectArrayList<GnpNodeEvaluationResult> makeSureAtLeastOneNotFirstProcessingNode(GnpIndividual ind, ObjectArrayList<GnpNodeEvaluationResult> executionPath, EvolutionState state) {
         boolean expectedPath = false;
         while (!expectedPath) {
 
@@ -332,7 +335,7 @@ public class TestGnp {
 
         for (Individual ind : state.population.subpops.get(0).individuals) {
 
-            List<GnpNodeEvaluationResult> executionPath = null;
+            ObjectArrayList<GnpNodeEvaluationResult> executionPath = null;
 
             //make sure there is at least one processing node executed
             executionPath = makeSureAtLeastOneNotFirstProcessingNode((GnpIndividual) ind, executionPath, state);
@@ -359,16 +362,16 @@ public class TestGnp {
 
           for (Individual ind : delayedRewardsState.population.subpops.get(0).individuals) {
 
-              List<GnpNodeEvaluationResult> executionPath = null;
+              ObjectArrayList<GnpNodeEvaluationResult> executionPath = null;
 
             //make sure there is at least one processing node executed
             executionPath = makeSureAtLeastOneNotFirstProcessingNode((GnpIndividual) ind, executionPath, delayedRewardsState);
 
-            for (Map.Entry<Integer, Integer> entry : ((GnpIndividual) ind).getFunctionExecutionIds().entrySet()) {
+            for (Int2IntOpenHashMap.Entry entry : ((GnpIndividual) ind).getFunctionExecutionIds().int2IntEntrySet()) {
 
                     //System.out.println("Before reward (executionId " + executionId + "): ");
                     //System.out.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath));
-                    ((GnpIndividual) ind).setDelayedReward(entry.getValue(), 10.0);
+                    ((GnpIndividual) ind).setDelayedReward(entry.getIntValue(), 10.0);
                     //System.out.println("After reward: ");
                     //System.out.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath));
 
@@ -393,7 +396,7 @@ public class TestGnp {
 
         for (Individual ind : eligibilityTracesState.population.subpops.get(0).individuals) {
 
-            List<GnpNodeEvaluationResult> executionPath = null;
+            ObjectArrayList<GnpNodeEvaluationResult> executionPath = null;
 
             //make sure there is at least one processing node executed
             executionPath = makeSureAtLeastOneNotFirstProcessingNode((GnpIndividual) ind, executionPath, eligibilityTracesState);
@@ -418,16 +421,16 @@ public class TestGnp {
 
         for (Individual ind : eligibilityTracesDelayedRewardsState.population.subpops.get(0).individuals) {
 
-            List<GnpNodeEvaluationResult> executionPath = null;
+            ObjectArrayList<GnpNodeEvaluationResult> executionPath = null;
 
             //make sure there is at least one processing node executed
             executionPath = makeSureAtLeastOneNotFirstProcessingNode((GnpIndividual) ind, executionPath, eligibilityTracesDelayedRewardsState);
 
-            for (Map.Entry<Integer, Integer> entry : ((GnpIndividual) ind).getFunctionExecutionIds().entrySet()) {
+            for (Int2IntOpenHashMap.Entry entry : ((GnpIndividual) ind).getFunctionExecutionIds().int2IntEntrySet()) {
 
                 //System.out.println("Before reward (executionId " + executionId + "): ");
                 //System.out.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath));
-                ((GnpIndividual) ind).setDelayedReward(entry.getValue(), 10.0);
+                ((GnpIndividual) ind).setDelayedReward(entry.getIntValue(), 10.0);
                 //System.out.println("After reward: ");
                 //System.out.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath));
 
@@ -453,7 +456,7 @@ public class TestGnp {
         //perform learning
         Individual ind = eligibilityTracesState.population.subpops.get(0).individuals.get(0);
 
-        List<GnpNodeEvaluationResult> executionPath = null;
+        ObjectArrayList<GnpNodeEvaluationResult> executionPath = null;
 
         //make sure there is at least one processing node executed
         makeSureAtLeastOneNotFirstProcessingNode((GnpIndividual) ind, executionPath, eligibilityTracesState);
@@ -502,6 +505,118 @@ public class TestGnp {
         GnpIndividual clonedInd = (GnpIndividual) ind.clone();
 
         //todo assert all the objects which needed are deep cloned
+
+    }
+
+    @Test
+    public void branchGeneMapKeyGeneratedAndParsed() {
+
+        GnpBranchGeneMapKeyParsed key = new GnpBranchGeneMapKeyParsed(0, 0);
+        int keyInt = ((GnpInitializer) state.initializer).getBranchGeneMapKey(key.getNodeId(), key.getBranchId());
+        GnpBranchGeneMapKeyParsed parsedKey = ((GnpInitializer) state.initializer).parseBranchGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getBranchId() == parsedKey.getBranchId());
+
+        key = new GnpBranchGeneMapKeyParsed(1, 0);
+        keyInt = ((GnpInitializer) state.initializer).getBranchGeneMapKey(key.getNodeId(), key.getBranchId());
+        parsedKey = ((GnpInitializer) state.initializer).parseBranchGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getBranchId() == parsedKey.getBranchId());
+
+        key = new GnpBranchGeneMapKeyParsed(0, 1);
+        keyInt = ((GnpInitializer) state.initializer).getBranchGeneMapKey(key.getNodeId(), key.getBranchId());
+        parsedKey = ((GnpInitializer) state.initializer).parseBranchGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getBranchId() == parsedKey.getBranchId());
+
+        key = new GnpBranchGeneMapKeyParsed(1, 1);
+        keyInt = ((GnpInitializer) state.initializer).getBranchGeneMapKey(key.getNodeId(), key.getBranchId());
+        parsedKey = ((GnpInitializer) state.initializer).parseBranchGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getBranchId() == parsedKey.getBranchId());
+
+    }
+
+    @Test
+    public void subnodeGeneMapKeyGeneratedAndParsed() {
+
+        GnpSubnodeGeneMapKeyParsed key = new GnpSubnodeGeneMapKeyParsed(0, 0);
+        int keyInt = ((GnpInitializer) state.initializer).getSubnodeGeneMapKey(key.getNodeId(), key.getSubnodeId());
+        GnpSubnodeGeneMapKeyParsed parsedKey = ((GnpInitializer) state.initializer).parseSubnodeGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+
+        key = new GnpSubnodeGeneMapKeyParsed(1, 0);
+        keyInt = ((GnpInitializer) state.initializer).getSubnodeGeneMapKey(key.getNodeId(), key.getSubnodeId());
+        parsedKey = ((GnpInitializer) state.initializer).parseSubnodeGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+
+        key = new GnpSubnodeGeneMapKeyParsed(0, 1);
+        keyInt = ((GnpInitializer) state.initializer).getSubnodeGeneMapKey(key.getNodeId(), key.getSubnodeId());
+        parsedKey = ((GnpInitializer) state.initializer).parseSubnodeGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+
+        key = new GnpSubnodeGeneMapKeyParsed(1, 1);
+        keyInt = ((GnpInitializer) state.initializer).getSubnodeGeneMapKey(key.getNodeId(), key.getSubnodeId());
+        parsedKey = ((GnpInitializer) state.initializer).parseSubnodeGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+
+    }
+
+    @Test
+    public void subnodeParameterGeneMapKeyGeneratedAndParsed() {
+
+        GnpSubnodeParamsGeneMapKeyParsed key = new GnpSubnodeParamsGeneMapKeyParsed(0, 0, 0);
+        int keyInt = ((GnpInitializer) state.initializer).getSubnodeParamsGeneMapKey(key.getNodeId(), key.getSubnodeId(), key.getParameterId());
+        GnpSubnodeParamsGeneMapKeyParsed parsedKey = ((GnpInitializer) state.initializer).parseSubnodeParamsGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+        assertTrue(key.getParameterId() == parsedKey.getParameterId());
+
+        key = new GnpSubnodeParamsGeneMapKeyParsed(1, 0, 0);
+        keyInt = ((GnpInitializer) state.initializer).getSubnodeParamsGeneMapKey(key.getNodeId(), key.getSubnodeId(), key.getParameterId());
+        parsedKey = ((GnpInitializer) state.initializer).parseSubnodeParamsGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+        assertTrue(key.getParameterId() == parsedKey.getParameterId());
+
+        key = new GnpSubnodeParamsGeneMapKeyParsed(0, 1, 0);
+        keyInt = ((GnpInitializer) state.initializer).getSubnodeParamsGeneMapKey(key.getNodeId(), key.getSubnodeId(), key.getParameterId());
+        parsedKey = ((GnpInitializer) state.initializer).parseSubnodeParamsGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+        assertTrue(key.getParameterId() == parsedKey.getParameterId());
+
+        key = new GnpSubnodeParamsGeneMapKeyParsed(1, 3, 0);
+        keyInt = ((GnpInitializer) state.initializer).getSubnodeParamsGeneMapKey(key.getNodeId(), key.getSubnodeId(), key.getParameterId());
+        parsedKey = ((GnpInitializer) state.initializer).parseSubnodeParamsGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+        assertTrue(key.getParameterId() == parsedKey.getParameterId());
+
+        key = new GnpSubnodeParamsGeneMapKeyParsed(1, 0, 1);
+        keyInt = ((GnpInitializer) state.initializer).getSubnodeParamsGeneMapKey(key.getNodeId(), key.getSubnodeId(), key.getParameterId());
+        parsedKey = ((GnpInitializer) state.initializer).parseSubnodeParamsGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+        assertTrue(key.getParameterId() == parsedKey.getParameterId());
+
+        key = new GnpSubnodeParamsGeneMapKeyParsed(0, 1, 1);
+        keyInt = ((GnpInitializer) state.initializer).getSubnodeParamsGeneMapKey(key.getNodeId(), key.getSubnodeId(), key.getParameterId());
+        parsedKey = ((GnpInitializer) state.initializer).parseSubnodeParamsGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+        assertTrue(key.getParameterId() == parsedKey.getParameterId());
+
+        key = new GnpSubnodeParamsGeneMapKeyParsed(1, 3, 1);
+        keyInt = ((GnpInitializer) state.initializer).getSubnodeParamsGeneMapKey(key.getNodeId(), key.getSubnodeId(), key.getParameterId());
+        parsedKey = ((GnpInitializer) state.initializer).parseSubnodeParamsGeneMapKey(keyInt);
+        assertTrue(key.getNodeId() == parsedKey.getNodeId());
+        assertTrue(key.getSubnodeId() == parsedKey.getSubnodeId());
+        assertTrue(key.getParameterId() == parsedKey.getParameterId());
 
     }
 

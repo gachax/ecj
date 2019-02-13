@@ -3,8 +3,8 @@ package ec.gnp.selection;
 import ec.EvolutionState;
 import ec.gnp.GnpSubnode;
 import ec.util.Parameter;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
-import java.util.ArrayList;
 
 /**
  * Implementations should select the GnpSubnode to be evaluated from the list of the GnpSubnodes
@@ -21,7 +21,7 @@ public interface GnpSubnodeSelector {
      * @param exploringProbability if provided, it will be used to determine exploring behavior
      * @return GnpSubnode
      */
-    GnpSubnode select(ArrayList<GnpSubnode> subnodes, int thread, boolean exploringEnabled, Double exploringProbability);
+    GnpSubnode select(ObjectArrayList<GnpSubnode> subnodes, int thread, boolean exploringEnabled, Double exploringProbability);
 
     /**
      * Called after initialization

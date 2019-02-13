@@ -23,11 +23,9 @@ public class GnpBranch extends GnpNetworkElement implements Serializable {
 
     public Object copy(double[] genome) {
 
-        GnpBranch myobj = new GnpBranch(this.id, genome, this.startGene);
-
         //Subnodes are created in GnpNode
 
-        return myobj;
+        return new GnpBranch(this.id, genome, this.startGene);
 
     }
 

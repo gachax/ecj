@@ -3,6 +3,10 @@ package ec.gnp;
 import ec.EvolutionState;
 import ec.util.Code;
 import ec.util.DecodeReturn;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -19,16 +23,17 @@ import java.util.*;
  */
 public class GnpNetwork  implements Serializable {
 
-    private List<GnpNode> networkNodes = new ArrayList<>();
-    private Integer startNodeId;
-    private Map<Integer, Integer> nodeTypes = new HashMap<>();
+    private ObjectArrayList<GnpNode> networkNodes = new ObjectArrayList<>();
+    private int startNodeId = -1;
+    private Int2IntOpenHashMap nodeTypes = new Int2IntOpenHashMap();
     private GnpInitializer init;
     private double[] previousGenome;
     private EvolutionState state;
-    private Map<String, Double> subnodeQValues = new HashMap<>();
-    private Map<String, Integer> subnodeFunctionIdValues = new HashMap<>();
+    private Int2DoubleOpenHashMap subnodeQValues = new Int2DoubleOpenHashMap();
+    private Int2IntOpenHashMap subnodeFunctionIdValues = new Int2IntOpenHashMap();
 
     void setup(EvolutionState state) {
+
         init = (GnpInitializer) state.initializer;
         this.state = state;
 
@@ -37,7 +42,7 @@ public class GnpNetwork  implements Serializable {
         }
 
         //set the random start node
-        if (networkNodes != null && startNodeId == null) {
+        if (networkNodes != null && startNodeId == -1) {
             startNodeId = state.random[0].nextInt(init.getNodeCount());
         }
 
@@ -65,8 +70,8 @@ public class GnpNetwork  implements Serializable {
         }
         myobj.startNodeId = this.startNodeId;
 
-        for (Map.Entry<Integer, Integer> nodeTypeEntry : nodeTypes.entrySet()) {
-            myobj.nodeTypes.put(nodeTypeEntry.getKey(), nodeTypeEntry.getValue());
+        for (Int2IntOpenHashMap.Entry nodeTypeEntry : nodeTypes.int2IntEntrySet()) {
+            myobj.nodeTypes.put(nodeTypeEntry.getIntKey(), nodeTypeEntry.getIntValue());
         }
 
         return myobj;
@@ -77,7 +82,7 @@ public class GnpNetwork  implements Serializable {
         //set random judgement nodes
         for (int j = 0; j < init.getJudgementNodeCount(); j++) {
 
-            Integer id = state.random[0].nextInt(init.getNodeCount());
+            int id = state.random[0].nextInt(init.getNodeCount());
             while (nodeTypes.containsKey(id)) {
                 id = state.random[0].nextInt(init.getNodeCount());
             }
@@ -86,7 +91,7 @@ public class GnpNetwork  implements Serializable {
         }
 
         //the rest are processing nodes
-        for (Integer n = 0; n < init.getNodeCount(); n++) {
+        for (int n = 0; n < init.getNodeCount(); n++) {
 
             if (!nodeTypes.containsKey(n)){
                 nodeTypes.put(n, GnpNode.PROCESSING_NODE);
@@ -118,8 +123,8 @@ public class GnpNetwork  implements Serializable {
         return random;
     }
 
-    private String getSubnodeAttributesMapKey(Integer nodeId, Integer subNodeId) {
-        return nodeId + "|" + subNodeId;
+    private int getSubnodeAttributesMapKey(int nodeId, int subNodeId) {
+        return init.getSubnodeGeneMapKey(nodeId, subNodeId);
     }
 
     public String qValuesToString() {
@@ -132,7 +137,7 @@ public class GnpNetwork  implements Serializable {
 
             for (GnpSubnode subnode : node.getSubnodes()) {
 
-                String key = getSubnodeAttributesMapKey(node.getId(), subnode.getId());
+                String key = node.getId() + "|" + subnode.getId();
 
                 s.append(Code.encode(key) + Code.encode(subnode.getQ()));
                 i++;
@@ -149,9 +154,9 @@ public class GnpNetwork  implements Serializable {
 
         StringBuilder s = new StringBuilder();
 
-        for (Map.Entry<Integer, Integer> entry: nodeTypes.entrySet()) {
+        for (Int2IntOpenHashMap.Entry entry: nodeTypes.int2IntEntrySet()) {
 
-            s.append(Code.encode((entry.getKey()) + "|" + entry.getValue()));
+            s.append(Code.encode((entry.getIntKey()) + "|" + entry.getIntValue()));
 
         }
 
@@ -171,13 +176,13 @@ public class GnpNetwork  implements Serializable {
 
             if (!networkNodes.isEmpty()) {
 
-                subnodeQValues = new HashMap<>();
-                subnodeFunctionIdValues = new HashMap<>();
+                subnodeQValues = new Int2DoubleOpenHashMap();
+                subnodeFunctionIdValues = new Int2IntOpenHashMap();
 
                 for (GnpNode node : networkNodes) {
                     for (GnpSubnode subnode : node.getSubnodes()) {
 
-                        String key = getSubnodeAttributesMapKey(node.getId(), subnode.getId());
+                        int key = getSubnodeAttributesMapKey(node.getId(), subnode.getId());
 
                         //store old subnode Q values to be reused for the re-generated network
                         subnodeQValues.put(key, subnode.getQ());
@@ -190,25 +195,25 @@ public class GnpNetwork  implements Serializable {
 
             }
 
-            networkNodes = new ArrayList<>();
+            networkNodes = new ObjectArrayList<>();
 
-            for (Integer n = 0; n < init.getNodeCount(); n++) {
+            for (int n = 0; n < init.getNodeCount(); n++) {
 
-                GnpNode node = (GnpNode) state.parameters.getInstanceForParameter(init.defaultBase().push(GnpNode.P_NODE), null, GnpNetworkElement.class);
+                GnpNode node = init.newGnpNodeInstance();
                 node.setup(n, genome, nodeTypes.get(n), init.getNodeGeneMap().get(n)[0], state);
 
                 networkNodes.add(node);
 
-                for (Integer sub = 0; sub < node.getSubnodeCount(); sub++) {
+                for (int sub = 0; sub < node.getSubnodeCount(); sub++) {
 
-                    GnpSubnode subnode = (GnpSubnode) state.parameters.getInstanceForParameter(init.defaultBase().push(GnpSubnode.P_SUB_NODE), null, GnpNetworkElement.class);
+                    GnpSubnode subnode = init.newGnpSubnodeInstance();
                     subnode.setup(nodeTypes.get(n), sub, genome, init.getSubnodeGeneMap().get(init.getSubnodeGeneMapKey(n, sub))[0], state, subnodeQValues.get(getSubnodeAttributesMapKey(n, sub)));
 
                     node.addSubnode(subnode);
 
                     for (int param = 0; param < init.getSubnodeParemetersCount(); param++) {
 
-                        Object subnodeParameter = state.parameters.getInstanceForParameter(init.getSubnodeParametersParameter().push(String.valueOf(param)), null, GnpSubnodeParameter.class);
+                        Object subnodeParameter = init.newGnpSubnodeParameterInstance(param);
 
                         ((GnpSubnodeParameter) subnodeParameter).setup(param, genome, init.getSubnodeParamsGeneMap().get(init.getSubnodeParamsGeneMapKey(n, sub, param))[0], state);
 
@@ -225,7 +230,7 @@ public class GnpNetwork  implements Serializable {
 
                 }
 
-                List<Integer> branchedNodes = new ArrayList<>();
+                IntArrayList branchedNodes = new IntArrayList();
 
                 //add subnodes to branches
                 for (Integer sub = 0; sub < node.getSubnodeCount(); sub++) {
@@ -280,9 +285,9 @@ public class GnpNetwork  implements Serializable {
     //Also, in case there are more nodes than branches, exclude already used nodes, so each branch points to a different node
     private void validateAndModifyTheBranch(EvolutionState state, int thread, GnpNode node, GnpBranch branch, List<Integer> usedNodes) {
 
-        List<Integer> nodesToExclude = new ArrayList<>();
+        IntArrayList nodesToExclude = new IntArrayList();
 
-        if (usedNodes.size() > 0) {
+        if (!usedNodes.isEmpty()) {
 
             nodesToExclude.addAll(usedNodes);
 
@@ -296,8 +301,8 @@ public class GnpNetwork  implements Serializable {
 
             branch.setConnectedNodeId(getRandomWithExclusion(state,
                     thread,
-                    Integer.valueOf(init.getConnectionsSegmentProperites().get(init.P_MIN_GENE)),
-                    Integer.valueOf(init.getConnectionsSegmentProperites().get(init.P_MAX_GENE)),
+                    Integer.valueOf(init.getConnectionsSegmentProperites().get(GnpInitializer.P_MIN_GENE)),
+                    Integer.valueOf(init.getConnectionsSegmentProperites().get(GnpInitializer.P_MAX_GENE)),
                     nodesToExclude.stream().mapToInt(i -> i).toArray()));
 
         }
@@ -308,16 +313,12 @@ public class GnpNetwork  implements Serializable {
         return networkNodes.get(startNodeId);
     }
 
-    public List<GnpNode> getNetworkNodes() {
+    public ObjectArrayList<GnpNode> getNetworkNodes() {
         return networkNodes;
     }
 
     public void setStartNodeId(int startNodeId) {
         this.startNodeId = startNodeId;
-    }
-
-    public Map<Integer, Integer> getNodeTypes() {
-        return nodeTypes;
     }
 
     public void parseQValues(LineNumberReader reader) throws IOException {
@@ -350,7 +351,7 @@ public class GnpNetwork  implements Serializable {
     public void parseNodeTypes(LineNumberReader reader) throws IOException {
 
 
-        nodeTypes = new HashMap<>();
+        nodeTypes = new Int2IntOpenHashMap();
 
         String s = reader.readLine();
         DecodeReturn d = new DecodeReturn(s);

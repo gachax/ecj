@@ -6,13 +6,11 @@ import ec.util.DecodeReturn;
 import ec.util.Parameter;
 import ec.vector.DoubleVectorIndividual;
 import ec.vector.VectorIndividual;
+import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.*;
 
 /**
  * Extends the DoubleVectorIndividual so it's based on the genome defined as an array and all the mutation/crossover functionality of DoubleVectorIndividual can be re-used.
@@ -32,28 +30,28 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
     private GnpNetwork network;
     private EvolutionState state;
     protected GnpInitializer init = null;
-    private GnpNode currentNode;
-    private Integer totalEvaluationCount;
+    private int totalEvaluationCount;
     //a path in the network of the current evaluation
-    private List<GnpNodeEvaluationResult> executionPath;
+    private ObjectArrayList<GnpNodeEvaluationResult> executionPath;
 
     //all the delayed (in case of Delayed Reward functions) rewards which are not set yet. <Integer ID, named differently at different places, but its the same - totalEvaluationCount/functionExecutionId/evaluationId, GnpReward - reward with all the necessary parameters to be able to distribute it>
-    protected Map<Integer, GnpReward> pendingRewards;
+    protected Int2ObjectOpenHashMap<GnpReward> pendingRewards;
 
     //a parameter which keeps track of the changes in the genome to determine whether the network conforms to the genome. It's also used to indicate that data from previous evaluations should be reset.
     protected boolean initialize = true;
 
     //if gnp.storeAllExecPaths is set it will contain all the executionPaths until cleared - might be useful in case of some debugging.
-    private List<List<GnpNodeEvaluationResult>> allExecPaths = new ArrayList<>();
+    private ObjectArrayList<ObjectArrayList<GnpNodeEvaluationResult>> allExecPaths = new ObjectArrayList<>();
 
     //stores the execution ids of the functions executed
-    private ConcurrentSkipListMap<Integer, Integer> functionExecutionIds = new ConcurrentSkipListMap<>();
 
-    public static String padRight(String s, int n) {
+    private Int2IntOpenHashMap functionExecutionIds = new Int2IntOpenHashMap();
+
+    private static String padRight(String s, int n) {
         return String.format("%1$-" + n + "s", s);
     }
 
-    public static String padLeft(String s, int n) {
+    private static String padLeft(String s, int n) {
         return String.format("%1$" + n + "s", s);
     }
 
@@ -62,6 +60,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param state EvolutionState
      * @param base Parameter
      */
+    @Override
     public void setup(final EvolutionState state, final Parameter base) {
 
         super.setup(state, base);
@@ -94,10 +93,10 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param additionalParameters additional parameters passed from Problem
      * @return LinkedHashMap<Integer, GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
-    public List<GnpNodeEvaluationResult> evaluateLearnExplore(EvolutionState state,
-                                                              int thread,
-                                                              Double exploringProbability,
-                                                              Object ... additionalParameters){
+    public ObjectArrayList<GnpNodeEvaluationResult> evaluateLearnExplore(EvolutionState state,
+                                                                    int thread,
+                                                                    Double exploringProbability,
+                                                                    Object ... additionalParameters){
         return evaluate(state, thread, true, true, exploringProbability, additionalParameters);
     }
 
@@ -110,8 +109,8 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @return List<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
     public List<GnpNodeEvaluationResult> evaluateDontLearnDontExplore(EvolutionState state,
-                                                                      int thread,
-                                                                      Object ... additionalParameters){
+                                                                            int thread,
+                                                                            Object ... additionalParameters){
         return evaluate(state, thread, false, false, null, additionalParameters);
     }
 
@@ -124,8 +123,8 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @return List<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
     public List<GnpNodeEvaluationResult> evaluateLearnDontExplore(EvolutionState state,
-                                                                  int thread,
-                                                                  Object ... additionalParameters){
+                                                                                int thread,
+                                                                                Object ... additionalParameters){
         return evaluate(state, thread, true, false, null, additionalParameters);
     }
 
@@ -140,7 +139,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * It can be considered to place this call in a specific problem implementation of Gnp by overriding the evaluate method of Problem.
      */
     public void afterEvaluation() {
-        executionPath = new ArrayList<>();
+        executionPath = new ObjectArrayList<>();
         clearEvaluations();
     }
 
@@ -149,11 +148,11 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      */
     private void clearEvaluations() {
 
-        pendingRewards = new HashMap<>();
+        pendingRewards = new Int2ObjectOpenHashMap<>();
         totalEvaluationCount = 0;
         clearFunctionExecutions();
-        allExecPaths = new ArrayList<>();
-        functionExecutionIds = new ConcurrentSkipListMap<>();
+        allExecPaths = new ObjectArrayList<>();
+        functionExecutionIds = new Int2IntOpenHashMap();
 
     }
 
@@ -165,14 +164,14 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param explore Explore the network according to the GnpSubnodeSelector implementation
      * @param exploringProbability if provided, it will be used to determine exploring behavior
      * @param additionalParameters additional parameters passed from Problem
-     * @return List<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
+     * @return ObjectArrayList<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
-    private List<GnpNodeEvaluationResult> evaluate(EvolutionState state,
-                                                   int thread,
-                                                   boolean learn,
-                                                   boolean explore,
-                                                   Double exploringProbability,
-                                                   Object ... additionalParameters){
+    private ObjectArrayList<GnpNodeEvaluationResult> evaluate(EvolutionState state,
+                                                                    int thread,
+                                                                    boolean learn,
+                                                                    boolean explore,
+                                                                    Double exploringProbability,
+                                                                    Object ... additionalParameters){
 
         if (initialize) {
 
@@ -185,9 +184,9 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
         int remainingTime = init.getMaxTime();
         GnpNodeEvaluationResult result;
 
-        currentNode = network.getStartNode();
+        GnpNode currentNode = network.getStartNode();
 
-        executionPath = new ArrayList<>();
+        executionPath = new ObjectArrayList<>();
 
         while (remainingTime > 0) {
 
@@ -233,7 +232,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param evaluationId the id of the evaluation, which can be obtained in evaluate method of the GnpFunction
      * @param rewardValue reward amount to be distributed
      */
-    public void setDelayedReward(Integer evaluationId, Double rewardValue) {
+    public void setDelayedReward(int evaluationId, Double rewardValue) {
 
         GnpReward reward = pendingRewards.get(evaluationId);
 
@@ -586,27 +585,27 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * Add funciton executionId to functionExecutionIds - used during evaluation of GnpNode
      * @param functionExecutionId
      */
-    public void addFunctionExecutionId(Integer functionExecutionId) {
+    public void addFunctionExecutionId(int functionExecutionId) {
         functionExecutionIds.put(functionExecutionId, functionExecutionId);
     }
 
     public void clearFunctionExecutions() {
-        functionExecutionIds = new ConcurrentSkipListMap<>();
+        functionExecutionIds = new Int2IntOpenHashMap();
     }
 
-    public void clearFunctionExecution(Integer functionExecutionId) {
+    public void clearFunctionExecution(int functionExecutionId) {
         functionExecutionIds.remove(functionExecutionId);
     }
 
-    public ConcurrentSkipListMap<Integer, Integer> getFunctionExecutionIds() {
+    public Int2IntOpenHashMap getFunctionExecutionIds() {
         return functionExecutionIds;
     }
 
     public void clearExecutionPaths() {
-        allExecPaths = new ArrayList<>();
+        allExecPaths = new ObjectArrayList<>();
     }
 
-    public List<List<GnpNodeEvaluationResult>> getAllExecPaths() {
+    public ObjectArrayList<ObjectArrayList<GnpNodeEvaluationResult>> getAllExecPaths() {
         return allExecPaths;
     }
 
@@ -688,7 +687,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
         super.printIndividual(state, log);
         state.output.println(network.nodeTypesToString(), log);
         state.output.println(Code.encode(network.getStartNode().getId()), log);
-        state.output.println(network.qValuesToString(), log);;
+        state.output.println(network.qValuesToString(), log);
     }
 
     @Override

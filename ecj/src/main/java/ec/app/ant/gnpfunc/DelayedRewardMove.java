@@ -3,6 +3,7 @@ package ec.app.ant.gnpfunc;
 import ec.EvolutionState;
 import ec.app.ant.AntGnp;
 import ec.gnp.*;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public class DelayedRewardMove extends GnpOneBranchDelayedRewardFunction {
     public GnpFunctionResult evaluate(final EvolutionState state,
                                          final int thread,
                                          final GnpIndividual individual,
-                                         final Integer evaluationId,
+                                         final int evaluationId,
                                          final List<GnpSubnodeParameter> parameters,
                                          Object ... additionalParameters) {
 
@@ -44,7 +45,7 @@ public class DelayedRewardMove extends GnpOneBranchDelayedRewardFunction {
         }
 
         p.moves++;
-        if (p.map[p.posx][p.posy]== AntGnp.FOOD && p.moves < p.maxMoves )
+        if (p.map[p.posx][p.posy]==AntGnp.FOOD && p.moves < p.maxMoves )
         {
             p.sum++;
 
@@ -52,12 +53,12 @@ public class DelayedRewardMove extends GnpOneBranchDelayedRewardFunction {
             if (p.functionEvaluationIds.containsKey(individual)) {
                 p.functionEvaluationIds.get(individual).add(evaluationId);
             } else {
-                List<Integer> evalIds = new ArrayList<>();
+                IntArrayList evalIds = new IntArrayList();
                 evalIds.add(evaluationId);
                 p.functionEvaluationIds.put(individual, evalIds);
             }
 
-            p.map[p.posx][p.posy]= AntGnp.ATE;
+            p.map[p.posx][p.posy]=AntGnp.ATE;
         }
 
         if (p.moves<p.maxMoves)

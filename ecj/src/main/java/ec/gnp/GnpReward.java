@@ -16,10 +16,10 @@ public class GnpReward {
 
     private GnpSubnode subnode;
     private List<GnpNodeEvaluationResult> executionPathUntilReward;
-    private Integer evaluationId;
+    private int evaluationId;
     private Double rewardValue;
 
-    public GnpReward(GnpSubnode subnode, List<GnpNodeEvaluationResult> executionPath, Integer evaluationId) {
+    public GnpReward(GnpSubnode subnode, List<GnpNodeEvaluationResult> executionPath, int evaluationId) {
 
         this.subnode = subnode;
         this.executionPathUntilReward = new ArrayList<>(executionPath);
@@ -27,7 +27,7 @@ public class GnpReward {
 
     }
 
-    public GnpReward(GnpSubnode subnode, List<GnpNodeEvaluationResult> executionPath, Integer evaluationId, Double rewardValue) {
+    public GnpReward(GnpSubnode subnode, List<GnpNodeEvaluationResult> executionPath, int evaluationId, Double rewardValue) {
         this.subnode = subnode;
         this.executionPathUntilReward = new ArrayList<>(executionPath);
         this.evaluationId = evaluationId;

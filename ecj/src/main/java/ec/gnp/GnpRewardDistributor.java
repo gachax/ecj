@@ -3,6 +3,7 @@ package ec.gnp;
 import ec.EvolutionState;
 import ec.util.Parameter;
 
+
 /**
  * Reward.rewardValue is the main part of the learning process of genetic network.
  * When reward is received, it must be assigned to the corresponding nodes.
