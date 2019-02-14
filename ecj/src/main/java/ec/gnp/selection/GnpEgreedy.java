@@ -5,6 +5,8 @@ import ec.gnp.GnpSubnode;
 import ec.util.Parameter;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
+import java.util.Comparator;
+
 /**
  * Implementation of GnpSubnodeSelector. Selects the GnpSubnode to be evaluated by using epsilon greedy algorithm.
  *
@@ -44,9 +46,12 @@ public class GnpEgreedy implements GnpSubnodeSelector{
 
         if(state.random[thread].nextDouble() < 1 - eGreedyEpsilonL) {
 
-            double maxQ = -Double.MAX_VALUE;
+            //double maxQ = -Double.MAX_VALUE;
 
-            for (GnpSubnode subnode : subnodes) {
+            resultingSubnode = subnodes.stream().max(Comparator.comparing(GnpSubnode::getQ)).get();
+
+
+            /*for (GnpSubnode subnode : subnodes) {
 
                 if (subnode.getQ() > maxQ) {
 
@@ -54,7 +59,7 @@ public class GnpEgreedy implements GnpSubnodeSelector{
                     maxQ = subnode.getQ();
                 }
 
-            }
+            }*/
 
         } else {
 

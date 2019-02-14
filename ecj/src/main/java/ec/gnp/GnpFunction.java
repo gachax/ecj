@@ -1,6 +1,9 @@
 package ec.gnp;
 
 import ec.EvolutionState;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +15,7 @@ import java.util.Map;
  */
 public abstract class GnpFunction {
 
-    private Map<String, Integer> branchNames = new HashMap<>();
+    private Object2IntOpenHashMap<String> branchNames = new Object2IntOpenHashMap<>();
 
     /**
      * Called after initialization.
@@ -35,7 +38,7 @@ public abstract class GnpFunction {
                                                   final int thread,
                                                   final GnpIndividual individual,
                                                   final int evaluationId,
-                                                  final List<GnpSubnodeParameter> parameters,
+                                                  final ObjectArrayList<GnpSubnodeParameter> parameters,
                                                   Object ... additionalParameters);
 
     /**
@@ -51,7 +54,7 @@ public abstract class GnpFunction {
      * @param parameters the name might depend on GnpSubnodeParameters, so they are accessible if needed.
      * @return
      */
-    public abstract String getName(final List<GnpSubnodeParameter> parameters);
+    public abstract String getName(final ObjectArrayList<GnpSubnodeParameter> parameters);
 
     /**
      * This have to be implemented by adding the names of all possible sunbode GN branches with addBranch(String branchName) method.
@@ -68,7 +71,7 @@ public abstract class GnpFunction {
         branchNames.put(branchName, branchNames.size());
     }
 
-    public Map<String, Integer> getBranchNames() {
+    public Object2IntOpenHashMap<String> getBranchNames() {
         return branchNames;
     }
 
@@ -76,8 +79,8 @@ public abstract class GnpFunction {
 
         String branchName = null;
 
-        for (Map.Entry<String, Integer> entry : branchNames.entrySet()){
-            if (entry.getValue() == branchId){
+        for (Object2IntOpenHashMap.Entry<String> entry : branchNames.object2IntEntrySet()){
+            if (entry.getIntValue() == branchId){
                 branchName = entry.getKey();
                 break;
             }

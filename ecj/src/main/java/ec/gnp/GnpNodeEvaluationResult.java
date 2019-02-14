@@ -17,9 +17,9 @@ public class GnpNodeEvaluationResult {
 
     private int evaluationId;
 
-    private Integer branchId;
+    private int branchId;
 
-    public GnpNodeEvaluationResult(GnpFunctionResult functionResult, GnpSubnode evaluatedSubnode, Integer branchId) {
+    public GnpNodeEvaluationResult(GnpFunctionResult functionResult, GnpSubnode evaluatedSubnode, int branchId) {
 
         this.functionResult = functionResult;
         this.evaluatedSubnode = evaluatedSubnode;
@@ -60,7 +60,7 @@ public class GnpNodeEvaluationResult {
         return execTimeQVlue;
     }
 
-    public Integer getBranchId() {
+    public int getBranchId() {
         return branchId;
     }
 

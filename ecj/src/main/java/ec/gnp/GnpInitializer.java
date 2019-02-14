@@ -6,6 +6,7 @@ import ec.simple.SimpleInitializer;
 import ec.util.Parameter;
 import ec.util.ParameterDatabase;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.*;
@@ -146,7 +147,7 @@ public class GnpInitializer extends SimpleInitializer {
             subnodeParameter.setState(state);
             subnodeParameter.setupGenes();
 
-            for (Map.Entry<GnpGeneDescriptor, Integer> geneOrder: subnodeParameter.getGenes().entrySet()) {
+            for (Object2IntMap.Entry<GnpGeneDescriptor> geneOrder: subnodeParameter.getGenes().object2IntEntrySet()) {
                 subnodeParameterGeneDescriptors.put(geneOrder.getKey(), subnodeParameter);
             }
 

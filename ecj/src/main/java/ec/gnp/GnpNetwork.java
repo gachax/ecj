@@ -219,7 +219,7 @@ public class GnpNetwork  implements Serializable {
 
                         subnode.addSubnodeParameter((GnpSubnodeParameter) subnodeParameter);
 
-                        Integer functionId = subnode.getFunctionId();
+                        int functionId = subnode.getFunctionId();
 
                         //if function changed (or new) - call the hook
                         if (!skipFunctionChangedCall && (subnodeFunctionIdValues.isEmpty() || functionId != subnodeFunctionIdValues.get(getSubnodeAttributesMapKey(n, sub)))) {
@@ -233,7 +233,7 @@ public class GnpNetwork  implements Serializable {
                 IntArrayList branchedNodes = new IntArrayList();
 
                 //add subnodes to branches
-                for (Integer sub = 0; sub < node.getSubnodeCount(); sub++) {
+                for (int sub = 0; sub < node.getSubnodeCount(); sub++) {
 
                     GnpSubnode subnode = node.getSubnodes().get(sub);
 
@@ -283,7 +283,7 @@ public class GnpNetwork  implements Serializable {
 
     //loops are not allowed, so reset the gene and make sure the branch of the node doesn't point to the node
     //Also, in case there are more nodes than branches, exclude already used nodes, so each branch points to a different node
-    private void validateAndModifyTheBranch(EvolutionState state, int thread, GnpNode node, GnpBranch branch, List<Integer> usedNodes) {
+    private void validateAndModifyTheBranch(EvolutionState state, int thread, GnpNode node, GnpBranch branch, IntArrayList usedNodes) {
 
         IntArrayList nodesToExclude = new IntArrayList();
 

@@ -108,7 +108,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param additionalParameters additional parameters passed from Problem
      * @return List<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
-    public List<GnpNodeEvaluationResult> evaluateDontLearnDontExplore(EvolutionState state,
+    public ObjectArrayList<GnpNodeEvaluationResult> evaluateDontLearnDontExplore(EvolutionState state,
                                                                             int thread,
                                                                             Object ... additionalParameters){
         return evaluate(state, thread, false, false, null, additionalParameters);
@@ -120,9 +120,9 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param state EvolutionState
      * @param thread thread number
      * @param additionalParameters additional parameters passed from Problem
-     * @return List<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
+     * @return ObjectArrayList<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
-    public List<GnpNodeEvaluationResult> evaluateLearnDontExplore(EvolutionState state,
+    public ObjectArrayList<GnpNodeEvaluationResult> evaluateLearnDontExplore(EvolutionState state,
                                                                                 int thread,
                                                                                 Object ... additionalParameters){
         return evaluate(state, thread, true, false, null, additionalParameters);
@@ -560,7 +560,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
                     stringBuilder.append("|");
                 }
 
-                Integer branchId = currNode.getBranches().get(b + branchOffset).getId();
+                int branchId = currNode.getBranches().get(b + branchOffset).getId();
                 if (result != null && result.getBranchId() == branchId) {
 
                     stringBuilder.append("<b" + branchId + "> * " + function.getBranchName(b) + " " + currNode.getBranches().get(b + branchOffset).getConnectedNodeId());

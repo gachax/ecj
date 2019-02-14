@@ -15,7 +15,7 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
     private EvolutionState state;
     private GnpInitializer init;
 
-    public void setup (Integer nodeType, int id, double[] genome, int startGene, final EvolutionState state, double Q) {
+    public void setup (int nodeType, int id, double[] genome, int startGene, final EvolutionState state, double Q) {
 
         this.id = id;
         this.genome = genome;

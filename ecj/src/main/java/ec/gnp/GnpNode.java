@@ -33,7 +33,7 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
      * @param startGene the gene index in the genome of the individual at which the node's genes start
      * @param state EvolutionState
      */
-    public void setup (Integer id, double[] genome, int type, int startGene, final EvolutionState state) {
+    public void setup (int id, double[] genome, int type, int startGene, final EvolutionState state) {
 
         this.id = id;
         this.genome = genome;
@@ -111,7 +111,7 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
     public GnpNodeEvaluationResult evaluate( final EvolutionState state,
                                              GnpIndividual individual,
                                              ObjectArrayList<GnpNodeEvaluationResult> executionPath,
-                                             Integer totalEvaluationCount,
+                                             int totalEvaluationCount,
                                              int thread,
                                              boolean learn,
                                              boolean explore,
@@ -166,7 +166,7 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
             init.getRewardDistributor().distributeReward(new GnpReward(subnode, executionPath, totalEvaluationCount, result.getRewardValue()));
         }
 
-        int functionBranchId =  function.getBranchNames().get(result.getBranch());
+        int functionBranchId =  function.getBranchNames().getInt(result.getBranch());
 
         int branchId = functionBranchId + branchOffset;
 

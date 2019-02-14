@@ -3,6 +3,7 @@ package ec.gnp.implementations;
 import ec.EvolutionState;
 import ec.Problem;
 import ec.gnp.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,7 +20,7 @@ public class GnpProcessingFunctionDelayedReward extends GnpOneBranchDelayedRewar
                                       int thread,
                                       GnpIndividual individual,
                                       final int evaluationId,
-                                      List<GnpSubnodeParameter> parameters,
+                                      ObjectArrayList<GnpSubnodeParameter> parameters,
                                       Object ... additionalParameters) {
 
         return result;
@@ -31,7 +32,7 @@ public class GnpProcessingFunctionDelayedReward extends GnpOneBranchDelayedRewar
     }
 
     @Override
-    public String getName(final List<GnpSubnodeParameter> parameters) {
+    public String getName(final ObjectArrayList<GnpSubnodeParameter> parameters) {
         return "GnpProcessingFunctionDelayedReward";
     }
 

@@ -4,6 +4,7 @@ import ec.EvolutionState;
 import ec.Problem;
 import ec.app.ant.AntGnp;
 import ec.gnp.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class Left extends GnpOneBranchFunction {
                                          final int thread,
                                          final GnpIndividual individual,
                                          final int evaluationId,
-                                         final List<GnpSubnodeParameter> parameters,
+                                         final ObjectArrayList<GnpSubnodeParameter> parameters,
                                          Object ... additionalParameters) {
 
         AntGnp p = (AntGnp) additionalParameters[0];
@@ -50,7 +51,7 @@ public class Left extends GnpOneBranchFunction {
     }
 
     @Override
-    public String getName(final List<GnpSubnodeParameter> parameters) {
+    public String getName(final ObjectArrayList<GnpSubnodeParameter> parameters) {
         return "Trun left";
     }
 

@@ -99,7 +99,7 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
         genes.put(gnpGeneDescriptor, genes.size());
     }
 
-    public Map<GnpGeneDescriptor, Integer> getGenes() {
+    public Object2IntLinkedOpenHashMap<GnpGeneDescriptor> getGenes() {
         return genes;
     }
 
