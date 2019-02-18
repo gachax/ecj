@@ -96,6 +96,8 @@ public class GnpInitializer extends SimpleInitializer {
     private GnpSubnode gnpSubnodeTemplate;
     private List<GnpSubnodeParameter> gnpSubnodeParameterTemplates;
 
+    Parameter subnodeParametersParameter;
+
     public Parameter defaultBase()
     {
         return GnpDefaults.base();
@@ -108,7 +110,7 @@ public class GnpInitializer extends SimpleInitializer {
 
         Parameter defaultBase = defaultBase();
 
-        Parameter subnodeParametersParameter = defaultBase.push(P_SUBNODE_PARAMETERS);
+        subnodeParametersParameter = defaultBase.push(P_SUBNODE_PARAMETERS);
 
         //load parameters
         maxTime = state.parameters.getInt(defaultBase.push(P_MAX_TIME), null);
@@ -144,8 +146,7 @@ public class GnpInitializer extends SimpleInitializer {
         for (int i = 0; i < subnodeParemetersCount; i++) {
 
             GnpSubnodeParameter subnodeParameter = (GnpSubnodeParameter) state.parameters.getInstanceForParameter(subnodeParametersParameter.push(String.valueOf(i)), null, GnpSubnodeParameter.class);
-            subnodeParameter.setState(state);
-            subnodeParameter.setupGenes();
+            subnodeParameter.setup(-1,null, 0, state);
 
             for (Object2IntMap.Entry<GnpGeneDescriptor> geneOrder: subnodeParameter.getGenes().object2IntEntrySet()) {
                 subnodeParameterGeneDescriptors.put(geneOrder.getKey(), subnodeParameter);
@@ -443,17 +444,21 @@ public class GnpInitializer extends SimpleInitializer {
     public GnpNode newGnpNodeInstance() {
 
         return (GnpNode) gnpNodeTemplate.lightClone();
+        //return (GnpNode) state.parameters.getInstanceForParameter(defaultBase().push(GnpNode.P_NODE), null, GnpNetworkElement.class);
+
     }
 
     public GnpSubnode newGnpSubnodeInstance() {
 
         return (GnpSubnode) gnpSubnodeTemplate.lightClone();
+        //return (GnpSubnode) state.parameters.getInstanceForParameter(defaultBase().push(GnpSubnode.P_SUB_NODE), null, GnpNetworkElement.class);
 
     }
 
-    public GnpSubnodeParameter newGnpSubnodeParameterInstance(int id) {
+    public GnpSubnodeParameter newGnpSubnodeParameterInstance( int id) {
 
         return (GnpSubnodeParameter) gnpSubnodeParameterTemplates.get(id).lightClone();
+        //return (GnpSubnodeParameter) state.parameters.getInstanceForParameter(subnodeParametersParameter.push(String.valueOf(id)), null, GnpSubnodeParameter.class);
 
     }
 

@@ -121,6 +121,7 @@ public class AntGnp extends Problem implements SimpleProblemForm
     public Object clone()
         {
         AntGnp myobj = (AntGnp) (super.clone());
+        myobj.functionEvaluationIds = new Object2ObjectOpenHashMap<>();
         myobj.map = new int[map.length][];
         for(int x=0;x<map.length;x++)
             myobj.map[x] = (int[])(map[x].clone());

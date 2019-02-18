@@ -3,8 +3,7 @@ package ec.gnp;
 import ec.EvolutionState;
 import ec.Evolve;
 import ec.Individual;
-import ec.gnp.implementations.GnpIntegerAndDoubleGenesSubnodeParameter;
-import ec.gnp.implementations.GnpTwoIntegerGenesSubnodeParameter;
+import ec.gnp.implementations.*;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.*;
@@ -84,6 +83,60 @@ public class TestGnp {
         for (EvolutionState state : states) {
             Evolve.cleanup(state);
         }
+
+    }
+
+    @Test
+    public void correctInstancesOfFunctionsAndSubnodeParameters() {
+
+
+        GnpIndividual ind = (GnpIndividual) state.population.subpops.get(0).individuals.get(0);
+        GnpNetwork network = ind.getNetwork();
+        assertTrue(network.getStartNode().getSubnodes().get(0).getSubnodeParameters().get(0) instanceof GnpTwoIntegerGenesSubnodeParameter);
+        assertTrue(network.getStartNode().getSubnodes().get(0).getSubnodeParameters().get(1) instanceof GnpIntegerAndDoubleGenesSubnodeParameter);
+        assertTrue(((GnpInitializer) state.initializer).getFunctionLibrary().getJudgementFunction(0) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) state.initializer).getFunctionLibrary().getJudgementFunction(1) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) state.initializer).getFunctionLibrary().getJudgementFunction(2) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) state.initializer).getFunctionLibrary().getJudgementFunction(3) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) state.initializer).getFunctionLibrary().getProcessingFunction(0) instanceof GnpProcessingFunction);
+        assertTrue(((GnpInitializer) state.initializer).getFunctionLibrary().getProcessingFunction(1) instanceof GnpProcessingFunction);
+        assertTrue(((GnpInitializer) state.initializer).getFunctionLibrary().getProcessingFunction(2) instanceof GnpProcessingFunction);
+
+        ind = (GnpIndividual) delayedRewardsState.population.subpops.get(0).individuals.get(0);
+        network = ind.getNetwork();
+        assertTrue(network.getStartNode().getSubnodes().get(0).getSubnodeParameters().get(0) instanceof GnpTwoIntegerGenesSubnodeParameter);
+        assertTrue(network.getStartNode().getSubnodes().get(0).getSubnodeParameters().get(1) instanceof GnpIntegerAndDoubleGenesSubnodeParameter);
+        assertTrue(((GnpInitializer) delayedRewardsState.initializer).getFunctionLibrary().getJudgementFunction(0) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) delayedRewardsState.initializer).getFunctionLibrary().getJudgementFunction(1) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) delayedRewardsState.initializer).getFunctionLibrary().getJudgementFunction(2) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) delayedRewardsState.initializer).getFunctionLibrary().getJudgementFunction(3) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) delayedRewardsState.initializer).getFunctionLibrary().getProcessingFunction(0) instanceof GnpProcessingFunctionDelayedReward);
+        assertTrue(((GnpInitializer) delayedRewardsState.initializer).getFunctionLibrary().getProcessingFunction(1) instanceof GnpProcessingFunctionDelayedReward);
+        assertTrue(((GnpInitializer) delayedRewardsState.initializer).getFunctionLibrary().getProcessingFunction(2) instanceof GnpProcessingFunctionDelayedReward);
+
+        ind = (GnpIndividual) eligibilityTracesState.population.subpops.get(0).individuals.get(0);
+        network = ind.getNetwork();
+        assertTrue(network.getStartNode().getSubnodes().get(0).getSubnodeParameters().get(0) instanceof GnpTwoIntegerGenesSubnodeParameter);
+        assertTrue(network.getStartNode().getSubnodes().get(0).getSubnodeParameters().get(1) instanceof GnpIntegerAndDoubleGenesSubnodeParameter);
+        assertTrue(((GnpInitializer) eligibilityTracesState.initializer).getFunctionLibrary().getJudgementFunction(0) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesState.initializer).getFunctionLibrary().getJudgementFunction(1) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesState.initializer).getFunctionLibrary().getJudgementFunction(2) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesState.initializer).getFunctionLibrary().getJudgementFunction(3) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesState.initializer).getFunctionLibrary().getProcessingFunction(0) instanceof GnpProcessingFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesState.initializer).getFunctionLibrary().getProcessingFunction(1) instanceof GnpProcessingFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesState.initializer).getFunctionLibrary().getProcessingFunction(2) instanceof GnpProcessingFunction);
+
+        ind = (GnpIndividual) eligibilityTracesDelayedRewardsState.population.subpops.get(0).individuals.get(0);
+        network = ind.getNetwork();
+        assertTrue(network.getStartNode().getSubnodes().get(0).getSubnodeParameters().get(0) instanceof GnpTwoIntegerGenesSubnodeParameter);
+        assertTrue(network.getStartNode().getSubnodes().get(0).getSubnodeParameters().get(1) instanceof GnpIntegerAndDoubleGenesSubnodeParameter);
+        assertTrue(((GnpInitializer) eligibilityTracesDelayedRewardsState.initializer).getFunctionLibrary().getJudgementFunction(0) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesDelayedRewardsState.initializer).getFunctionLibrary().getJudgementFunction(1) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesDelayedRewardsState.initializer).getFunctionLibrary().getJudgementFunction(2) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesDelayedRewardsState.initializer).getFunctionLibrary().getJudgementFunction(3) instanceof GnpJudgementFunction);
+        assertTrue(((GnpInitializer) eligibilityTracesDelayedRewardsState.initializer).getFunctionLibrary().getProcessingFunction(0) instanceof GnpProcessingFunctionDelayedReward);
+        assertTrue(((GnpInitializer) eligibilityTracesDelayedRewardsState.initializer).getFunctionLibrary().getProcessingFunction(1) instanceof GnpProcessingFunctionDelayedReward);
+        assertTrue(((GnpInitializer) eligibilityTracesDelayedRewardsState.initializer).getFunctionLibrary().getProcessingFunction(2) instanceof GnpProcessingFunctionDelayedReward);
 
     }
 
@@ -428,11 +481,11 @@ public class TestGnp {
 
             for (Int2IntOpenHashMap.Entry entry : ((GnpIndividual) ind).getFunctionExecutionIds().int2IntEntrySet()) {
 
-                //System.out.println("Before reward (executionId " + executionId + "): ");
-                //System.out.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath));
+                System.out.println("Before reward (executionId " + entry.getIntValue() + "): ");
+                System.out.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath));
                 ((GnpIndividual) ind).setDelayedReward(entry.getIntValue(), 10.0);
-                //System.out.println("After reward: ");
-                //System.out.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath));
+                System.out.println("After reward: ");
+                System.out.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath));
 
             }
 

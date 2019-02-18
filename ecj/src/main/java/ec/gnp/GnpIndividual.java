@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Extends the DoubleVectorIndividual so it's based on the genome defined as an array and all the mutation/crossover functionality of DoubleVectorIndividual can be re-used.
@@ -41,11 +42,12 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
     protected boolean initialize = true;
 
     //if gnp.storeAllExecPaths is set it will contain all the executionPaths until cleared - might be useful in case of some debugging.
-    private ObjectArrayList<ObjectArrayList<GnpNodeEvaluationResult>> allExecPaths = new ObjectArrayList<>();
+    private ObjectArrayList<ObjectArrayList<GnpNodeEvaluationResult>> allExecPaths;
 
     //stores the execution ids of the functions executed
 
-    private Int2IntOpenHashMap functionExecutionIds = new Int2IntOpenHashMap();
+    private Int2IntOpenHashMap functionExecutionIds;
+    //private ConcurrentSkipListMap<Integer, Integer> functionExecutionIds = new ConcurrentSkipListMap<>();
 
     private static String padRight(String s, int n) {
         return String.format("%1$-" + n + "s", s);
@@ -251,6 +253,9 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
             clearFunctionExecution(evaluationId);
 
         }
+        /*else {
+            throw new RuntimeException("Pending reward with evaluation id: " + evaluationId + " not found!");
+        }*/
 
     }
 
@@ -310,6 +315,10 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
     public String stringOutputGenomeVsNetwork() {
 
         StringBuilder sb = new StringBuilder();
+
+        if (network.getNetworkNodes().isEmpty()) {
+            network.generateNetwork(state,  0, genome, false);
+        }
 
         if (!network.getNetworkNodes().isEmpty()) {
 
@@ -678,6 +687,9 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
     public void printIndividualForHumans(EvolutionState state, int log) {
         super.printIndividualForHumans(state, log);
         state.output.println(network.nodeTypesToString(), log);
+        if (network.getNetworkNodes().isEmpty()) {
+            network.generateNetwork(state,  0, genome, false);
+        }
         state.output.println(Code.encode(network.getStartNode().getId()), log);
         state.output.println(network.qValuesToString(), log);
     }
@@ -685,6 +697,9 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
     @Override
     public void printIndividual(EvolutionState state, int log) {
         super.printIndividual(state, log);
+        if (network.getNetworkNodes().isEmpty()) {
+            network.generateNetwork(state,  0, genome, false);
+        }
         state.output.println(network.nodeTypesToString(), log);
         state.output.println(Code.encode(network.getStartNode().getId()), log);
         state.output.println(network.qValuesToString(), log);
@@ -693,6 +708,9 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
     @Override
     public void printIndividual(EvolutionState state, PrintWriter writer) {
         super.printIndividual(state, writer);
+        if (network.getNetworkNodes().isEmpty()) {
+            network.generateNetwork(state,  0, genome, false);
+        }
         writer.println(network.nodeTypesToString());
         writer.println(Code.encode(network.getStartNode().getId()));
         writer.println(network.qValuesToString());

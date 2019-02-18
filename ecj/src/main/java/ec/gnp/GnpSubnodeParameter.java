@@ -16,7 +16,7 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
 
     protected EvolutionState state;
     private double[] localGenome; //reducing performance cost of going through the whole genome of the individual
-    private Object2IntLinkedOpenHashMap<GnpGeneDescriptor> genes = new Object2IntLinkedOpenHashMap<>();//parameter specific gene configuration
+    private Object2IntLinkedOpenHashMap<GnpGeneDescriptor> genes;//parameter specific gene configuration
 
 
     /**
@@ -45,13 +45,17 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
      */
     private void setupLocalGenome() {
 
-        localGenome = new double[genes.size()];
-        /*
-        for (int i = 0; i < genes.size(); i++){
-            localGenome[i] = genome[startGene + i];
+        if (genome != null) {
+
+            localGenome = new double[genes.size()];
+            /*
+            for (int i = 0; i < genes.size(); i++){
+                localGenome[i] = genome[startGene + i];
+            }
+            */
+            System.arraycopy(genome, startGene, localGenome, 0, genes.size());
+
         }
-        */
-        System.arraycopy(genome, startGene, localGenome, 0, genes.size());
 
     }
 

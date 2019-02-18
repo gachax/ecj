@@ -23,19 +23,33 @@ import java.util.*;
  */
 public class GnpNetwork  implements Serializable {
 
-    private ObjectArrayList<GnpNode> networkNodes = new ObjectArrayList<>();
+    private ObjectArrayList<GnpNode> networkNodes;
     private int startNodeId = -1;
-    private Int2IntOpenHashMap nodeTypes = new Int2IntOpenHashMap();
+    private Int2IntOpenHashMap nodeTypes;
     private GnpInitializer init;
     private double[] previousGenome;
     private EvolutionState state;
-    private Int2DoubleOpenHashMap subnodeQValues = new Int2DoubleOpenHashMap();
-    private Int2IntOpenHashMap subnodeFunctionIdValues = new Int2IntOpenHashMap();
+    private Int2DoubleOpenHashMap subnodeQValues;
+    private Int2IntOpenHashMap subnodeFunctionIdValues;
 
-    void setup(EvolutionState state) {
+    public void setup(EvolutionState state) {
 
         init = (GnpInitializer) state.initializer;
         this.state = state;
+
+        subnodeQValues = new Int2DoubleOpenHashMap();
+        subnodeFunctionIdValues = new Int2IntOpenHashMap();
+        nodeTypes = new Int2IntOpenHashMap();
+        networkNodes = new ObjectArrayList<>();
+
+        /*if (networkToCopySetupFrom != null) {
+
+            startNodeId = networkToCopySetupFrom.startNodeId;
+            for (Int2IntOpenHashMap.Entry nodeTypeEntry : networkToCopySetupFrom.nodeTypes.int2IntEntrySet()) {
+                nodeTypes.put(nodeTypeEntry.getIntKey(), nodeTypeEntry.getIntValue());
+            }
+
+        }*/
 
         if (nodeTypes.isEmpty()) {
             setNodeTypes(state);
@@ -60,6 +74,11 @@ public class GnpNetwork  implements Serializable {
 
         myobj.state = this.state;
         myobj.init = this.init;
+
+        myobj.subnodeQValues = new Int2DoubleOpenHashMap();
+        myobj.subnodeFunctionIdValues = new Int2IntOpenHashMap();
+        myobj.networkNodes = new ObjectArrayList<>();
+        myobj.nodeTypes = new Int2IntOpenHashMap();
 
         for (GnpNode node : networkNodes) {
             myobj.getNetworkNodes().add((GnpNode) node.copy(genome));
