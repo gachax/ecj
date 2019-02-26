@@ -24,6 +24,7 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
     private ObjectArrayList<GnpBranch> branches; //the list of branches
     private GnpInitializer init;
     private EvolutionState state;
+    private GnpSubnode maxQValuedSubnode;
 
     /**
      * Called after initialization.
@@ -53,7 +54,11 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
         myobj.setup(this.id, genome, this.type, this.startGene, this.state);
 
         for (GnpSubnode subnode : subnodes) {
-            myobj.subnodes.add((GnpSubnode) subnode.copy(genome));
+            myobj.subnodes.add((GnpSubnode) subnode.copy(myobj, genome));
+        }
+
+        if (maxQValuedSubnode != null) {
+            myobj.maxQValuedSubnode = myobj.subnodes.get(maxQValuedSubnode.getId());
         }
 
         for (GnpBranch branch : branches) {
@@ -118,7 +123,7 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
                                              Double exploringProbability,
                                              Object ... additionalParameters) {
 
-        GnpSubnode subnode = init.getSubnodeSelector().select(subnodes, thread, explore, exploringProbability);
+        GnpSubnode subnode = init.getSubnodeSelector().select(subnodes, maxQValuedSubnode, thread, explore, exploringProbability);
 
         GnpFunctionResult result;
 
@@ -131,7 +136,6 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
             branchOffset = subnode.getId() * init.getFunctionLibrary().getMaxJudgementResultCount();
 
             if (learn && function instanceof GnpDelayedRewardFunction && function.rewardExpected()) {
-            //if (function instanceof GnpDelayedRewardFunction && function.rewardExpected()) {
 
                 individual.addPendingReward(new GnpReward(subnode, executionPath, totalEvaluationCount));
                 individual.addFunctionExecutionId(totalEvaluationCount);
@@ -144,7 +148,6 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
             branchOffset = subnode.getId();
 
             if (learn && function instanceof GnpDelayedRewardFunction && function.rewardExpected()) {
-            //if (function instanceof GnpDelayedRewardFunction && function.rewardExpected()) {
 
                 individual.addPendingReward(new GnpReward(subnode, executionPath, totalEvaluationCount));
                 individual.addFunctionExecutionId(totalEvaluationCount);
@@ -173,6 +176,26 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
         int branchId = functionBranchId + branchOffset;
 
         return new GnpNodeEvaluationResult(result, subnode, branchId);
+
+    }
+
+    public GnpSubnode getMaxQValuedSubnode() {
+        return maxQValuedSubnode;
+    }
+
+    public void resetMaxQValuedSubnodeIfQGreater(GnpSubnode subnode) {
+
+        if (this.maxQValuedSubnode == null) {
+
+            this.maxQValuedSubnode = subnode;
+
+        } else {
+
+            if (subnode.getQ() > this.maxQValuedSubnode.getQ()) {
+                this.maxQValuedSubnode = subnode;
+            }
+
+        }
 
     }
 

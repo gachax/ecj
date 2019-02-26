@@ -1,11 +1,10 @@
 package ec.gnp.selection;
 
 import ec.EvolutionState;
+import ec.gnp.GnpInitializer;
 import ec.gnp.GnpSubnode;
 import ec.util.Parameter;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-
-import java.util.Comparator;
 
 /**
  * Implementation of GnpSubnodeSelector. Selects the GnpSubnode to be evaluated by using epsilon greedy algorithm.
@@ -22,13 +21,14 @@ public class GnpEgreedy implements GnpSubnodeSelector{
     /**
      * Selects the GnpSubnode to be evaluated by using epsilon greedy algorithm.
      * @param subnodes list of subnodes at the current GnpNode
+     * @param maxQValuedSubnode if known, then it will be faster to provide this, otherwise null
      * @param thread thread number
      * @param exploringEnabled if true, exploring enabled, otherwise no exploring - subnode selection is based only on the highest Q value not the random part of the selection
      * @param exploringProbability if provided, it will be used to determine exploring behavior
      * @return
      */
     @Override
-    public GnpSubnode select(ObjectArrayList<GnpSubnode> subnodes, int thread, boolean exploringEnabled, Double exploringProbability) {
+    public GnpSubnode select(ObjectArrayList<GnpSubnode> subnodes, GnpSubnode maxQValuedSubnode, int thread, boolean exploringEnabled, Double exploringProbability) {
 
         GnpSubnode resultingSubnode = null;
 
@@ -44,26 +44,36 @@ public class GnpEgreedy implements GnpSubnodeSelector{
             eGreedyEpsilonL = 0;
         }
 
-        if(state.random[thread].nextDouble() < 1 - eGreedyEpsilonL) {
+        //if(state.random[thread].nextDouble() < 1 - eGreedyEpsilonL) {
+        if(((GnpInitializer)state.initializer).random[thread].nextDouble() < 1 - eGreedyEpsilonL) {
 
-            //double maxQ = -Double.MAX_VALUE;
+            if (maxQValuedSubnode != null) {
 
-            resultingSubnode = subnodes.stream().max(Comparator.comparing(GnpSubnode::getQ)).get();
+                resultingSubnode = maxQValuedSubnode;
 
+            } else {
 
-            /*for (GnpSubnode subnode : subnodes) {
+                double maxQ = -Double.MAX_VALUE;
 
-                if (subnode.getQ() > maxQ) {
+                //resultingSubnode = subnodes.stream().max(Comparator.comparing(GnpSubnode::getQ)).get();
 
-                    resultingSubnode = subnode;
-                    maxQ = subnode.getQ();
+                for (GnpSubnode subnode : subnodes) {
+
+                    if (subnode.getQ() > maxQ) {
+
+                        resultingSubnode = subnode;
+                        maxQ = subnode.getQ();
+
+                    }
+
                 }
 
-            }*/
+            }
 
         } else {
 
-            resultingSubnode = subnodes.get(state.random[thread].nextInt(subnodes.size()));
+            //resultingSubnode = subnodes.get(state.random[thread].nextInt(subnodes.size()));
+            resultingSubnode = subnodes.get(((GnpInitializer)state.initializer).random[thread].nextInt(subnodes.size()));
 
         }
 
@@ -80,6 +90,8 @@ public class GnpEgreedy implements GnpSubnodeSelector{
         eGreedyEpsilon = state.parameters.getDouble(eGreedyBase.push(P_EPSILON), null);
 
     }
+
+
 
     public double geteGreedyEpsilon() {
         return eGreedyEpsilon;

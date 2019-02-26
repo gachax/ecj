@@ -57,12 +57,12 @@ public class GnpNetwork  implements Serializable {
 
         //set the random start node
         if (networkNodes != null && startNodeId == -1) {
-            startNodeId = state.random[0].nextInt(init.getNodeCount());
+            startNodeId = init.random[0].nextInt(init.getNodeCount());
         }
 
         if (init.isStartWithJudgement()) {
             while (nodeTypes.get(startNodeId) != GnpNode.JUDGEMENT_NODE) {
-                startNodeId = state.random[0].nextInt(init.getNodeCount());
+                startNodeId = init.random[0].nextInt(init.getNodeCount());
             }
         }
 
@@ -96,14 +96,39 @@ public class GnpNetwork  implements Serializable {
         return myobj;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GnpNetwork)) return false;
+
+        GnpNetwork that = (GnpNetwork) o;
+
+        if (startNodeId != that.startNodeId) return false;
+        if (networkNodes != null ? !networkNodes.equals(that.networkNodes) : that.networkNodes != null) return false;
+        if (nodeTypes != null ? !nodeTypes.equals(that.nodeTypes) : that.nodeTypes != null) return false;
+        if (subnodeQValues != null ? !subnodeQValues.equals(that.subnodeQValues) : that.subnodeQValues != null)
+            return false;
+        return subnodeFunctionIdValues != null ? subnodeFunctionIdValues.equals(that.subnodeFunctionIdValues) : that.subnodeFunctionIdValues == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = networkNodes != null ? networkNodes.hashCode() : 0;
+        result = 31 * result + startNodeId;
+        result = 31 * result + (nodeTypes != null ? nodeTypes.hashCode() : 0);
+        result = 31 * result + (subnodeQValues != null ? subnodeQValues.hashCode() : 0);
+        result = 31 * result + (subnodeFunctionIdValues != null ? subnodeFunctionIdValues.hashCode() : 0);
+        return result;
+    }
+
     private void setNodeTypes(final EvolutionState state) {
 
         //set random judgement nodes
         for (int j = 0; j < init.getJudgementNodeCount(); j++) {
 
-            int id = state.random[0].nextInt(init.getNodeCount());
+            int id = init.random[0].nextInt(init.getNodeCount());
             while (nodeTypes.containsKey(id)) {
-                id = state.random[0].nextInt(init.getNodeCount());
+                id = init.random[0].nextInt(init.getNodeCount());
             }
             nodeTypes.put(id , GnpNode.JUDGEMENT_NODE);
 
@@ -132,7 +157,7 @@ public class GnpNetwork  implements Serializable {
     }
 
     private int getRandomWithExclusion(final EvolutionState state, int thread, int start, int end, int... exclude) {
-        int random = start + state.random[thread].nextInt(end - start + 1 - exclude.length);
+        int random = start + init.random[thread].nextInt(end - start + 1 - exclude.length);
         for (int ex : exclude) {
             if (random < ex) {
                 break;
@@ -226,7 +251,7 @@ public class GnpNetwork  implements Serializable {
                 for (int sub = 0; sub < node.getSubnodeCount(); sub++) {
 
                     GnpSubnode subnode = init.newGnpSubnodeInstance();
-                    subnode.setup(nodeTypes.get(n), sub, genome, init.getSubnodeGeneMap().get(init.getSubnodeGeneMapKey(n, sub))[0], state, subnodeQValues.get(getSubnodeAttributesMapKey(n, sub)));
+                    subnode.setup(node, nodeTypes.get(n), sub, genome, init.getSubnodeGeneMap().get(init.getSubnodeGeneMapKey(n, sub))[0], state, subnodeQValues.get(getSubnodeAttributesMapKey(n, sub)));
 
                     node.addSubnode(subnode);
 

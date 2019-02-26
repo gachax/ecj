@@ -1,6 +1,7 @@
 package ec.gnp;
 
 import ec.EvolutionState;
+import ec.Evolve;
 import ec.gnp.selection.GnpSubnodeSelector;
 import ec.simple.SimpleInitializer;
 import ec.util.Parameter;
@@ -103,10 +104,14 @@ public class GnpInitializer extends SimpleInitializer {
         return GnpDefaults.base();
     }
 
+    public SplittableRandom random[];
+
     @Override
     public void setup(final EvolutionState state, final Parameter base) {
 
         super.setup(state, base);
+
+        setupRandomGenerators(state);
 
         Parameter defaultBase = defaultBase();
 
@@ -176,6 +181,16 @@ public class GnpInitializer extends SimpleInitializer {
         setupSegments(state);
         setupGeneMap();
         setupObjectTemplates(state, subnodeParametersParameter);
+
+    }
+
+    private void setupRandomGenerators(EvolutionState state) {
+
+        random = new SplittableRandom[state.breedthreads > state.evalthreads ? state.breedthreads : state.evalthreads];
+        int time = (int)(System.currentTimeMillis());
+        for (int i =0; i < random.length; i++) {
+            random[i] = new SplittableRandom(Evolve.determineSeed(state.output, state.parameters, new Parameter(Evolve.P_SEED).push("" + i),time + i, random.length * state.randomSeedOffset, false));
+        }
 
     }
 

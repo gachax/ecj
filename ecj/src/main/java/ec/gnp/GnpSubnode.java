@@ -11,11 +11,12 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
     private int functionId = -1;
     private double Q = 0.0;
     protected int nodeType;
+    protected GnpNode parentNode;
     private ObjectArrayList<GnpSubnodeParameter> subnodeParameters;
     private EvolutionState state;
     private GnpInitializer init;
 
-    public void setup (int nodeType, int id, double[] genome, int startGene, final EvolutionState state, double Q) {
+    public void setup (GnpNode parentNode, int nodeType, int id, double[] genome, int startGene, final EvolutionState state, double Q) {
 
         this.id = id;
         this.genome = genome;
@@ -24,16 +25,17 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
         this.state = state;
         this.init = ((GnpInitializer) state.initializer);
         this.Q = Q;
+        this.parentNode = parentNode;
 
         subnodeParameters = new ObjectArrayList<>();
 
     }
 
-    public Object copy(double[] genome) {
+    public Object copy(GnpNode parentNode, double[] genome) {
 
         GnpSubnode myobj = init.newGnpSubnodeInstance();
 
-        myobj.setup(this.nodeType, this.id, genome, this.startGene, this.state, this.Q);
+        myobj.setup(parentNode, this.nodeType, this.id, genome, this.startGene, this.state, this.Q);
 
         for (GnpSubnodeParameter subnodeParameter : subnodeParameters) {
             myobj.subnodeParameters.add((GnpSubnodeParameter) subnodeParameter.copy(genome));
@@ -78,7 +80,10 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
     }
 
     public void setQ(double q) {
+
         Q = q;
+        parentNode.resetMaxQValuedSubnodeIfQGreater(this);
+
     }
 
     public int getStartGene() {

@@ -86,6 +86,27 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
         return myobj;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GnpIndividual)) return false;
+        if (!super.equals(o)) return false;
+
+        GnpIndividual that = (GnpIndividual) o;
+
+        return network != null ? network.equals(that.network) : that.network == null;
+    }
+
+    @Override
+    public int hashCode() {
+
+        int result = super.hashCode();
+        result = 31 * result + (network != null ? network.hashCode() : 0);
+        return result;
+
+    }
+
     /**
      * Evaluate the network. Learn by setting the rewards which means setting Q values of GnpSubnodes and explore the network according to the GnpSubnodeSelector implementation.
      * Used when training the individual.
@@ -168,7 +189,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param additionalParameters additional parameters passed from Problem
      * @return ObjectArrayList<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
-    private ObjectArrayList<GnpNodeEvaluationResult> evaluate(EvolutionState state,
+    private synchronized ObjectArrayList<GnpNodeEvaluationResult> evaluate(EvolutionState state,
                                                                     int thread,
                                                                     boolean learn,
                                                                     boolean explore,
