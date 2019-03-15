@@ -199,6 +199,10 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
 
     }
 
+    public void setMaxQValuedSubnode(GnpSubnode maxQValuedSubnode) {
+        this.maxQValuedSubnode = maxQValuedSubnode;
+    }
+
     public int getId() {
         return id;
     }

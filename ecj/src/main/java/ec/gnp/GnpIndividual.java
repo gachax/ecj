@@ -86,6 +86,17 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
         return myobj;
     }
 
+    public void forget() {
+
+        for (GnpNode node : network.getNetworkNodes()) {
+            for (GnpSubnode subnode : node.getSubnodes()) {
+                subnode.setQ(0.0);
+            }
+            node.setMaxQValuedSubnode(null);
+        }
+
+    }
+
 
     @Override
     public boolean equals(Object o) {
