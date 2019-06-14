@@ -82,7 +82,7 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
     public void setQ(double q) {
 
         Q = q;
-        parentNode.resetMaxQValuedSubnodeIfQGreater(this);
+        parentNode.resetMaxQValuedSubnode();
 
     }
 

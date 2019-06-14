@@ -1,10 +1,7 @@
 package ec.gnp.sarsa;
 
 import ec.EvolutionState;
-import ec.gnp.GnpNodeEvaluationResult;
-import ec.gnp.GnpReward;
-import ec.gnp.GnpRewardDistributor;
-import ec.gnp.GnpSubnode;
+import ec.gnp.*;
 import ec.util.Parameter;
 
 /**

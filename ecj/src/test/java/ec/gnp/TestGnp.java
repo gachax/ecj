@@ -17,16 +17,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestGnp {
 
     private final String paramsFilePath = System.getProperty("user.dir") + "/ecj/src/test/java/ec/gnp/" + "gnp_test.params";
-    private final String delayedRewardsParamsFilePath = System.getProperty("user.dir") + "/ecj/src/test/java/ec/gnp/" + "gnp_test_delayed_rewards.params";
-    private final String sarsaEligibilityTracesParamsFilePath = System.getProperty("user.dir") + "/ecj/src/test/java/ec/gnp/" + "gnp_test_sarsa_eligibility_traces.params";
-    private final String sarsaEligibilityTracesDelayedRewardsParamsFilePath = System.getProperty("user.dir") + "/ecj/src/test/java/ec/gnp/" + "gnp_test_sarsa_eligibility_traces_delayed_rewards.params";
+    private final String delayedRewardsParamsFilePath = System.getProperty("user.dir") + "/ecj//src/test/java/ec/gnp/" + "gnp_test_delayed_rewards.params";
+    private final String sarsaEligibilityTracesParamsFilePath = System.getProperty("user.dir") + "/ecj//src/test/java/ec/gnp/" + "gnp_test_sarsa_eligibility_traces.params";
+    private final String sarsaEligibilityTracesDelayedRewardsParamsFilePath = System.getProperty("user.dir") + "/ecj//src/test/java/ec/gnp/" + "gnp_test_sarsa_eligibility_traces_delayed_rewards.params";
 
     private List<EvolutionState> states = new ArrayList<>();
     private EvolutionState state;
@@ -529,8 +527,6 @@ public class TestGnp {
 
         assertEquals(sWriter.toString(), newSWriter.toString());
 
-
-
     }
 
     @Test
@@ -556,6 +552,11 @@ public class TestGnp {
         GnpIndividual ind = (GnpIndividual) state.population.subpops.get(0).individuals.get(0);
 
         GnpIndividual clonedInd = (GnpIndividual) ind.clone();
+
+        assertTrue(ind.equals(clonedInd));
+        assertTrue(ind.hashCode() == clonedInd.hashCode());
+
+        assertTrue(ind != clonedInd);
 
         //todo assert all the objects which needed are deep cloned
 

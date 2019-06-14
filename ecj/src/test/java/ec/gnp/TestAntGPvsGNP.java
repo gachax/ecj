@@ -14,8 +14,8 @@ import java.io.IOException;
 
 public class TestAntGPvsGNP {
 
-    private final String antGpParamsFilePath = System.getProperty("user.dir") + "/ecj/src/main/resources/ec/app/ant/ant.params";
-    private final String antGnpParamsFilePath = System.getProperty("user.dir") + "/ecj/src/main/resources/ec/app/ant/gnp.params";
+    private final String antGpParamsFilePath = System.getProperty("user.dir") + "/ecj//src/main/resources/ec/app/ant/ant.params";
+    private final String antGnpParamsFilePath = System.getProperty("user.dir") + "/ecj//src/main/resources/ec/app/ant/gnp.params";
 
     private EvolutionState antGpState;
     private EvolutionState antGnpState;
@@ -48,8 +48,7 @@ public class TestAntGPvsGNP {
 
     @Test
     @Ignore
-    public void runAntGp(){
-
+    public void runAntGp() throws InterruptedException {
         antGpState.run(EvolutionState.C_STARTED_FRESH);
 
     }
