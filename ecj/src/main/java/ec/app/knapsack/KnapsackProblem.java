@@ -18,8 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Definition of a basic knapsack problem.
+ *
+ * This problem takes a list of sizes (<code>base.sizes</code>) and values (<code>base.values</code>), as well as an
+ * overall knapsack size (<code>base.knapsack-size</code>).
  *
  * @author Eric O. Scott
+ * @see KnapsackComponent
+ * @see ec.co
  */
 public class KnapsackProblem extends Problem implements SimpleProblemForm, ConstructiveProblemForm {
     public final static String P_SIZES = "sizes";
@@ -33,14 +39,23 @@ public class KnapsackProblem extends Problem implements SimpleProblemForm, Const
     private boolean allowDuplicates;
     
     @Override
-    public void setup(final EvolutionState state, final Parameter base) {
+    public List<Component> getAllComponents()
+    {
+        return new ArrayList<Component>(components); // Defensive copy
+    }
+    
+    @Override
+    public void setup(final EvolutionState state, final Parameter base)
+    {
         assert(state != null);
         assert(base != null);
         knapsackSize = state.parameters.getDouble(base.push(P_KNAPSACK_SIZE), null);
         allowDuplicates = state.parameters.getBoolean(base.push(P_ALLOW_DUPLICATES), null, false);
         
         final double[] sizes = state.parameters.getDoubles(base.push(P_SIZES), null, 0);
-        final double[] values = state.parameters.getDoubles(base.push(P_VALUES), null, 0, sizes.length);
+        final double[] values = state.parameters.getDoubles(base.push(P_VALUES), null, 0);
+        if (sizes.length != values.length)
+            state.output.fatal(String.format("%s: '%s' has %d elements, but '%s' has %d elements.  Must be the same length.", this.getClass().getSimpleName(), base.push(P_SIZES), sizes.length, base.push(P_VALUES), values.length));
         assert(sizes.length == values.length);
         components = new ArrayList<KnapsackComponent>(sizes.length);
         for (int i = 0; i < sizes.length; i++)

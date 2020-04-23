@@ -5,14 +5,23 @@
 */
 package ec.app.knapsack;
 
+import ec.EvolutionState;
 import ec.co.Component;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * A component representing an object in a knapsack problem.
+ *
+ * The heuristic <code>desirability()</code> of a <code>KnapsackComponent</code> is equal to its <code>value</code>
+ * attribute.
  * 
  * @author Eric O. Scott
+ * @see KnapsackProblem
+ * @see ec.co
  */
-public class KnapsackComponent implements Component {
+public class KnapsackComponent extends Component {
     private double size;
     private double value;
     
@@ -46,11 +55,26 @@ public class KnapsackComponent implements Component {
         return value;
     }
 
-    /** @return The heuristic value of the component (which is equal to its value). */
+    /** @return The heuristic value of the component (higher is better). */
     @Override
-    public double cost() {
+    public double desirability() {
         assert(repOK());
         return value;
+    }
+    
+    @Override
+    public void writeComponent(final EvolutionState state, final DataOutput output) throws IOException
+    {
+        output.writeDouble(size);
+        output.writeDouble(value);
+    }
+    
+    @Override
+    public Component readComponent(final EvolutionState state, final DataInput input) throws IOException
+    {
+        final double size = input.readDouble();
+        final double value = input.readDouble();
+        return new KnapsackComponent(size, value);
     }
     
     /** @return False iff the object is in an inconsistent state. */

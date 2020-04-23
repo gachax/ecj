@@ -72,7 +72,8 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
      * @return the value of the int based gene
      */
     protected int getIntGeneValue(GnpGeneDescriptor gnpGeneDescriptor) {
-        return (int) localGenome[genes.getInt(gnpGeneDescriptor)];
+        //return (int) localGenome[genes.getInt(gnpGeneDescriptor)];
+        return (int) localGenome[gnpGeneDescriptor.getId()];
     }
 
     /**
@@ -81,7 +82,8 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
      * @return the value of the double based gene
      */
     protected double getDoubleGeneValue(GnpGeneDescriptor gnpGeneDescriptor) {
-        return localGenome[genes.getInt(gnpGeneDescriptor)];
+        //return localGenome[genes.getInt(gnpGeneDescriptor)];
+        return localGenome[gnpGeneDescriptor.getId()];
     }
 
     private void setValue(double value, int geneIndex) {
@@ -100,7 +102,11 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
     }
 
     protected void addGene(GnpGeneDescriptor gnpGeneDescriptor){
-        genes.put(gnpGeneDescriptor, genes.size());
+
+        int id = genes.size();
+        gnpGeneDescriptor.setId(id);
+        genes.put(gnpGeneDescriptor, id);
+
     }
 
     public Object2IntLinkedOpenHashMap<GnpGeneDescriptor> getGenes() {

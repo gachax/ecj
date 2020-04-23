@@ -13,32 +13,15 @@ import ec.util.Parameter;
 import java.util.List;
 
 /**
+ * A trivial rule that builds solutions greedily to have the highest heuristic value in the neighborhood.
  *
  * @author Eric O. Scott
  */
-public class GreedyComponentSelector implements ComponentSelector, Setup {
-    public final static String P_MINIMIZE = "minimize-local-cost";
-    
-    private boolean minimize;
+public class GreedyComponentSelector implements ComponentSelector {
     
     public GreedyComponentSelector() {}
-    
-    public GreedyComponentSelector(final boolean minimize)
-    {
-        this.minimize = minimize;
-    }
-    
-    public boolean isMinimize()
-    {
-        return minimize;
-    }
-    
-    @Override
-    public void setup(final EvolutionState state, final Parameter base)
-    {
-        assert(state != null);
-        assert(base != null);
-        minimize = state.parameters.getBoolean(base.push(P_MINIMIZE), null, true);
+
+    public void setup(final EvolutionState state, final Parameter base) {
         assert(repOK());
     }
 
@@ -48,13 +31,13 @@ public class GreedyComponentSelector implements ComponentSelector, Setup {
         assert(!components.isEmpty());
         assert(!Misc.containsNulls(components));
         
-        double bestCost = minimize ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+        double bestValue = Double.NEGATIVE_INFINITY;
         Component best = null;
         for (final Component c : components)
             {
-                if (minimize ? c.cost() <= bestCost : c.cost() >= bestCost)
+                if (c.desirability() >= bestValue)
                     {
-                    bestCost = c.cost();
+                    bestValue = c.desirability();
                     best = c;
                     }
             }

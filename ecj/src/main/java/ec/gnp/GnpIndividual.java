@@ -33,7 +33,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
     protected GnpInitializer init = null;
     private int totalEvaluationCount;
     //a path in the network of the current evaluation
-    private ObjectArrayList<GnpNodeEvaluationResult> executionPath;
+    private Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> executionPaths;
 
     //all the delayed (in case of Delayed Reward functions) rewards which are not set yet. <Integer ID, named differently at different places, but its the same - totalEvaluationCount/functionExecutionId/evaluationId, GnpReward - reward with all the necessary parameters to be able to distribute it>
     protected Int2ObjectOpenHashMap<GnpReward> pendingRewards;
@@ -42,7 +42,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
     protected boolean initialize = true;
 
     //if gnp.storeAllExecPaths is set it will contain all the executionPaths until cleared - might be useful in case of some debugging.
-    private ObjectArrayList<ObjectArrayList<GnpNodeEvaluationResult>> allExecPaths;
+    private ObjectArrayList<Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>>> allExecPaths;
 
     //stores the execution ids of the functions executed
 
@@ -97,6 +97,22 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
 
     }
 
+    public boolean equalsIgnoringQ(Object o) {
+
+        if (this == o) return true;
+        if (!(o instanceof GnpIndividual)) return false;
+        return super.equals(o);
+
+    }
+
+    public int hashCodeIgnoringQ() {
+
+        int result = super.hashCode();
+
+        return result;
+
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -106,14 +122,53 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
 
         GnpIndividual that = (GnpIndividual) o;
 
-        return network != null ? network.equals(that.network) : that.network == null;
+        //if genome is equal then check the Q values otherwise networks must be the same
+        if (network != null) {
+
+            if (network.getNetworkNodes().size() != that.network.getNetworkNodes().size()) return false;
+
+            for (int i = 0; i < network.getNetworkNodes().size(); i++) {
+
+                if (network.getNetworkNodes().get(i).getSubnodes().size() != that.network.getNetworkNodes().get(i).getSubnodes().size()) return false;
+
+                for (int j = 0; j < network.getNetworkNodes().get(i).getSubnodes().size(); j++) {
+
+                    if (network.getNetworkNodes().get(i).getSubnodes().get(j).getQ() != that.network.getNetworkNodes().get(i).getSubnodes().get(j).getQ()) return false;
+
+                }
+
+            }
+
+            return true;
+
+        } else {
+
+            return true;
+
+        }
+
     }
 
     @Override
     public int hashCode() {
 
         int result = super.hashCode();
-        result = 31 * result + (network != null ? network.hashCode() : 0);
+
+        //only Q values makes the difference, all the other network information comes from genome
+        if (network != null) {
+
+            for (GnpNode node : network.getNetworkNodes()) {
+
+                for (GnpSubnode subnode : node.getSubnodes()) {
+
+                    result = 31 * result + Double.valueOf(subnode.getQ()).hashCode();
+
+                }
+
+            }
+
+        }
+
         return result;
 
     }
@@ -127,7 +182,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param additionalParameters additional parameters passed from Problem
      * @return LinkedHashMap<Integer, GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
-    public ObjectArrayList<GnpNodeEvaluationResult> evaluateLearnExplore(EvolutionState state,
+    public Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> evaluateLearnExplore(EvolutionState state,
                                                                     int thread,
                                                                     Double exploringProbability,
                                                                     Object ... additionalParameters){
@@ -142,7 +197,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param additionalParameters additional parameters passed from Problem
      * @return List<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
-    public ObjectArrayList<GnpNodeEvaluationResult> evaluateDontLearnDontExplore(EvolutionState state,
+    public Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> evaluateDontLearnDontExplore(EvolutionState state,
                                                                             int thread,
                                                                             Object ... additionalParameters){
         return evaluate(state, thread, false, false, null, additionalParameters);
@@ -156,7 +211,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param additionalParameters additional parameters passed from Problem
      * @return ObjectArrayList<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
-    public ObjectArrayList<GnpNodeEvaluationResult> evaluateLearnDontExplore(EvolutionState state,
+    public Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> evaluateLearnDontExplore(EvolutionState state,
                                                                                 int thread,
                                                                                 Object ... additionalParameters){
         return evaluate(state, thread, true, false, null, additionalParameters);
@@ -173,7 +228,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * It can be considered to place this call in a specific problem implementation of Gnp by overriding the evaluate method of Problem.
      */
     public void afterEvaluation() {
-        executionPath = new ObjectArrayList<>();
+        executionPaths = new Int2ObjectOpenHashMap<>();
         clearEvaluations();
     }
 
@@ -200,7 +255,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @param additionalParameters additional parameters passed from Problem
      * @return ObjectArrayList<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
-    private synchronized ObjectArrayList<GnpNodeEvaluationResult> evaluate(EvolutionState state,
+    private synchronized Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> evaluate(EvolutionState state,
                                                                     int thread,
                                                                     boolean learn,
                                                                     boolean explore,
@@ -212,44 +267,62 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
             network.generateNetwork(state,  thread, genome, false);
             clearEvaluations();
             initialize = false;
+            //TODO after initialize hook, in order to enable cashing of genome (maybe other network related values) on TraderInd side
 
         }
 
-        int remainingTime = init.getMaxTime();
         GnpNodeEvaluationResult result;
 
-        GnpNode currentNode = network.getStartNode();
+        executionPaths = new Int2ObjectOpenHashMap<>();
 
-        executionPath = new ObjectArrayList<>();
+        for (int i = 0; i < network.getStartNodeIds().length; i++) {
 
-        while (remainingTime > 0) {
+            int remainingTime = init.getMaxTime();
 
-            if (currentNode.getType() == GnpNode.JUDGEMENT_NODE) {
-                remainingTime -= init.getJudgementTime();
+            GnpNode currentNode = network.getNetworkNodes().get(network.getStartNodeIds()[i]);
+
+            ObjectArrayList currentExecutionPath = new ObjectArrayList<GnpNodeEvaluationResult>();
+
+            while (remainingTime > 0) {
+
+                if (currentNode.getType() == GnpNode.JUDGEMENT_NODE) {
+                    remainingTime -= init.getJudgementTime();
+                }
+
+                if (currentNode.getType() == GnpNode.PROCESSING_NODE) {
+                    remainingTime -= init.getProcessingTime();
+                }
+
+                result = currentNode.evaluate(state, this, currentExecutionPath, totalEvaluationCount, thread, learn, explore, exploringProbability, additionalParameters);
+
+                if (result != null) {
+
+                    result.setEvaluatedNode(currentNode);
+                    result.setEvaluationId(totalEvaluationCount);
+
+                    currentExecutionPath.add(result);
+
+                    totalEvaluationCount++;
+
+                    currentNode = network.getNetworkNodes().get(currentNode.getBranches().get(result.getBranchId()).getConnectedNodeId());
+
+                } else {
+
+                    remainingTime = 0;
+
+                }
+
             }
 
-            if (currentNode.getType() == GnpNode.PROCESSING_NODE) {
-                remainingTime -= init.getProcessingTime();
-            }
-
-            result = currentNode.evaluate(state, this, executionPath, totalEvaluationCount, thread, learn, explore, exploringProbability, additionalParameters);
-
-            result.setEvaluatedNode(currentNode);
-            result.setEvaluationId(totalEvaluationCount);
-
-            executionPath.add(result);
-
-            totalEvaluationCount++;
-
-            currentNode = network.getNetworkNodes().get(currentNode.getBranches().get(result.getBranchId()).getConnectedNodeId());
+            executionPaths.put(i, currentExecutionPath);
 
         }
 
         if (init.isStoreAllExecPaths()) {
-            allExecPaths.add(executionPath);
+            allExecPaths.add(executionPaths);
         }
 
-        return executionPath;
+        return executionPaths;
 
     }
 
@@ -566,8 +639,10 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
 
         stringBuilder.append(" n" + currNode.getId());
 
-        if (currNode.getId() == network.getStartNode().getId()) {
-            stringBuilder.append(" [color=blue]");
+        for (int i = 0; i < network.getStartNodeIds().length; i++) {
+            if (currNode.getId() == network.getStartNodeIds()[i]) {
+                stringBuilder.append(" [color=blue]");
+            }
         }
 
         stringBuilder.append(" [label=\"<n" + currNode.getId() + "> " + nodeType + currNode.getId());
@@ -646,7 +721,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
         allExecPaths = new ObjectArrayList<>();
     }
 
-    public ObjectArrayList<ObjectArrayList<GnpNodeEvaluationResult>> getAllExecPaths() {
+    public ObjectArrayList<Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>>> getAllExecPaths() {
         return allExecPaths;
     }
 
@@ -722,7 +797,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
         if (network.getNetworkNodes().isEmpty()) {
             network.generateNetwork(state,  0, genome, false);
         }
-        state.output.println(Code.encode(network.getStartNode().getId()), log);
+        state.output.println(network.startNodeIdsToString(), log);
         state.output.println(network.qValuesToString(), log);
     }
 
@@ -733,7 +808,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
             network.generateNetwork(state,  0, genome, false);
         }
         state.output.println(network.nodeTypesToString(), log);
-        state.output.println(Code.encode(network.getStartNode().getId()), log);
+        state.output.println(network.startNodeIdsToString(), log);
         state.output.println(network.qValuesToString(), log);
     }
 
@@ -744,7 +819,7 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
             network.generateNetwork(state,  0, genome, false);
         }
         writer.println(network.nodeTypesToString());
-        writer.println(Code.encode(network.getStartNode().getId()));
+        writer.println(network.startNodeIdsToString());
         writer.println(network.qValuesToString());
     }
 
@@ -756,15 +831,8 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
     public void readIndividual(EvolutionState state, LineNumberReader reader) throws IOException {
         super.readIndividual(state, reader);
         network.parseNodeTypes(reader);
+        network.parseStartNodes(reader);
         network.generateNetwork(state, 0 , genome, true);
-
-        String s = reader.readLine();
-        DecodeReturn d = new DecodeReturn(s);
-        Code.decode(d);
-        if (d.type != DecodeReturn.T_INTEGER) {
-            state.output.fatal("Individual does not have an integer indicating the start node id.");
-        }
-        network.setStartNodeId((int) (d.l));
         network.parseQValues(reader);
     }
 }

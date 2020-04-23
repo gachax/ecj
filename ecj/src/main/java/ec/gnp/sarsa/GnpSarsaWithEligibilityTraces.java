@@ -29,21 +29,25 @@ public class GnpSarsaWithEligibilityTraces implements GnpRewardDistributor {
         //set reward to the current subnode
         reward.getSubnode().setQ(reward.getReward());
 
-        if (reward.getExecutionPathUntilReward() != null && !reward.getExecutionPathUntilReward().isEmpty() && reward.getEvaluationId() > 0) {
+        if (reward.getExecutionPathUntilReward() != null && !reward.getExecutionPathUntilReward().isEmpty()) {
 
-            int executionsVsPathUntilRewardOffset = reward.getExecutionPathUntilReward().get(0).getEvaluationId();
+            int firstEvaluationIdOfThePath = reward.getExecutionPathUntilReward().get(0).getEvaluationId();
 
-            GnpSubnode previousSubnode = reward.getExecutionPathUntilReward().get(reward.getEvaluationId() - executionsVsPathUntilRewardOffset -1).getEvaluatedSubnode();
+            if (reward.getEvaluationId() > firstEvaluationIdOfThePath) {
 
-            Double delta = reward.getReward() + discountRate * reward.getSubnode().getQ() - previousSubnode.getQ();
-            Double e = 1.0;
+                GnpSubnode previousSubnode = reward.getExecutionPathUntilReward().get(reward.getEvaluationId() - firstEvaluationIdOfThePath - 1).getEvaluatedSubnode();
 
-            for (int i = reward.getEvaluationId()-1; i >= reward.getExecutionPathUntilReward().get(0).getEvaluationId(); i--) {
+                Double delta = reward.getReward() + discountRate * reward.getSubnode().getQ() - previousSubnode.getQ();
+                Double e = 1.0;
 
-                GnpNodeEvaluationResult evalResult = reward.getExecutionPathUntilReward().get(i - executionsVsPathUntilRewardOffset);
+                for (int i = reward.getEvaluationId() - 1; i >= reward.getExecutionPathUntilReward().get(0).getEvaluationId(); i--) {
 
-                evalResult.getEvaluatedSubnode().setQ(evalResult.getEvaluatedSubnode().getQ() + learningRate * delta * e);
-                e = discountRate * traceDecay * e;
+                    GnpNodeEvaluationResult evalResult = reward.getExecutionPathUntilReward().get(i - firstEvaluationIdOfThePath);
+
+                    evalResult.getEvaluatedSubnode().setQ(evalResult.getEvaluatedSubnode().getQ() + learningRate * delta * e);
+                    e = discountRate * traceDecay * e;
+
+                }
 
             }
 

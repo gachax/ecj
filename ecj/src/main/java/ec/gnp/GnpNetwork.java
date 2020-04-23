@@ -24,7 +24,7 @@ import java.util.*;
 public class GnpNetwork  implements Serializable {
 
     private ObjectArrayList<GnpNode> networkNodes;
-    private int startNodeId = -1;
+    private int[] startNodeIds;
     private Int2IntOpenHashMap nodeTypes;
     private GnpInitializer init;
     private double[] previousGenome;
@@ -36,6 +36,9 @@ public class GnpNetwork  implements Serializable {
 
         init = (GnpInitializer) state.initializer;
         this.state = state;
+
+        this.startNodeIds = new int[init.getStartNodeCount()];
+        Arrays.fill(this.startNodeIds, -1);
 
         subnodeQValues = new Int2DoubleOpenHashMap();
         subnodeFunctionIdValues = new Int2IntOpenHashMap();
@@ -55,16 +58,25 @@ public class GnpNetwork  implements Serializable {
             setNodeTypes(state);
         }
 
-        //set the random start node
-        if (networkNodes != null && startNodeId == -1) {
-            startNodeId = init.random[0].nextInt(init.getNodeCount());
+        //set the random start nodes
+        if (networkNodes != null) {
+
+            for (int i = 0; i < this.startNodeIds.length; i++) {
+
+                if (this.startNodeIds[i] == -1) {
+                    this.startNodeIds[i] = init.random[0].nextInt(init.getNodeCount());
+                }
+
+                if (init.isStartWithJudgement()) {
+                    while (nodeTypes.get(this.startNodeIds[i]) != GnpNode.JUDGEMENT_NODE) {
+                        this.startNodeIds[i] = init.random[0].nextInt(init.getNodeCount());
+                    }
+                }
+
+            }
+
         }
 
-        if (init.isStartWithJudgement()) {
-            while (nodeTypes.get(startNodeId) != GnpNode.JUDGEMENT_NODE) {
-                startNodeId = init.random[0].nextInt(init.getNodeCount());
-            }
-        }
 
     }
 
@@ -87,38 +99,17 @@ public class GnpNetwork  implements Serializable {
         if (this.previousGenome !=null) {
             myobj.previousGenome = this.previousGenome.clone();
         }
-        myobj.startNodeId = this.startNodeId;
+
+        myobj.startNodeIds = new int[myobj.init.getStartNodeCount()];
+        for (int i = 0; i < this.startNodeIds.length; i++) {
+            myobj.startNodeIds[i] = this.startNodeIds[i];
+        }
 
         for (Int2IntOpenHashMap.Entry nodeTypeEntry : nodeTypes.int2IntEntrySet()) {
             myobj.nodeTypes.put(nodeTypeEntry.getIntKey(), nodeTypeEntry.getIntValue());
         }
 
         return myobj;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GnpNetwork)) return false;
-
-        GnpNetwork that = (GnpNetwork) o;
-
-        if (startNodeId != that.startNodeId) return false;
-        if (networkNodes != null ? !networkNodes.equals(that.networkNodes) : that.networkNodes != null) return false;
-        if (nodeTypes != null ? !nodeTypes.equals(that.nodeTypes) : that.nodeTypes != null) return false;
-        if (subnodeQValues != null ? !subnodeQValues.equals(that.subnodeQValues) : that.subnodeQValues != null)
-            return false;
-        return subnodeFunctionIdValues != null ? subnodeFunctionIdValues.equals(that.subnodeFunctionIdValues) : that.subnodeFunctionIdValues == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = networkNodes != null ? networkNodes.hashCode() : 0;
-        result = 31 * result + startNodeId;
-        result = 31 * result + (nodeTypes != null ? nodeTypes.hashCode() : 0);
-        result = 31 * result + (subnodeQValues != null ? subnodeQValues.hashCode() : 0);
-        result = 31 * result + (subnodeFunctionIdValues != null ? subnodeFunctionIdValues.hashCode() : 0);
-        return result;
     }
 
     private void setNodeTypes(final EvolutionState state) {
@@ -201,6 +192,19 @@ public class GnpNetwork  implements Serializable {
         for (Int2IntOpenHashMap.Entry entry: nodeTypes.int2IntEntrySet()) {
 
             s.append(Code.encode((entry.getIntKey()) + "|" + entry.getIntValue()));
+
+        }
+
+        return s.toString();
+    }
+
+    public String startNodeIdsToString() {
+
+        StringBuilder s = new StringBuilder();
+
+        for (int i = 0; i < startNodeIds.length; i++) {
+
+            s.append(Code.encode(startNodeIds[i]));
 
         }
 
@@ -353,16 +357,8 @@ public class GnpNetwork  implements Serializable {
 
     }
 
-    public GnpNode getStartNode() {
-        return networkNodes.get(startNodeId);
-    }
-
     public ObjectArrayList<GnpNode> getNetworkNodes() {
         return networkNodes;
-    }
-
-    public void setStartNodeId(int startNodeId) {
-        this.startNodeId = startNodeId;
     }
 
     public void parseQValues(LineNumberReader reader) throws IOException {
@@ -411,4 +407,27 @@ public class GnpNetwork  implements Serializable {
 
     }
 
+    public int[] getStartNodeIds() {
+        return startNodeIds;
+    }
+
+    public void parseStartNodes(LineNumberReader reader) throws IOException {
+
+        startNodeIds = new int[init.getStartNodeCount()];
+
+        String s = reader.readLine();
+        DecodeReturn d = new DecodeReturn(s);
+
+        // read in the start node ids
+        for (int i = 0; i < startNodeIds.length; i++) {
+
+            Code.decode(d);
+            if (d.type != DecodeReturn.T_INTEGER) {
+                state.output.fatal("Individual does not have an integer indicating the start node id.");
+            }
+            startNodeIds[i] = (int) (d.l);
+
+        }
+
+    }
 }

@@ -14,11 +14,13 @@ import ec.util.Parameter;
 import java.util.List;
 
 /**
- *
+ * Builds an individual by adding one component at a time.  The component
+ * is chosen using a <code>ComponentSelector</code> of your choice.
+ * 
  * @author Eric O. Scott
  */
 public class SimpleConstructionRule implements ConstructionRule, Setup {
-    public final static String P_SELECTOR = "componentSelector";
+    public final static String P_SELECTOR = "component-selector";
     public final static String P_START = "start-component";
 
     private String startComponent;
@@ -35,7 +37,7 @@ public class SimpleConstructionRule implements ConstructionRule, Setup {
         assert(repOK());
     }
 
-    /** Constructs a solution by greedily adding the lowest-cost component at 
+    /** Constructs a solution by greedily adding the lowest-desirability component at
      * each step until a complete solution is formed.  The pheromone matrix
      * argument is ignored, and may be null.
      */

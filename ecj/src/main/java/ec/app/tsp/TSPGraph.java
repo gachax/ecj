@@ -5,9 +5,12 @@
 */
 package ec.app.tsp;
 
+import ec.EvolutionState;
 import ec.co.Component;
 import ec.util.Misc;
 import java.io.BufferedReader;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -164,7 +166,7 @@ public class TSPGraph {
         return new TSPComponent(from, to);
     }
     
-    public class TSPComponent implements Component
+    public class TSPComponent extends Component
     {
         private int fromNode;
         private int toNode;
@@ -197,24 +199,39 @@ public class TSPGraph {
         }
         
         @Override
-        public double cost()
+        public double desirability()
+        {
+            final double eta = 1.0/distance();
+            assert(!Double.isInfinite(eta));
+            assert(!Double.isNaN(eta));
+            return eta;
+        }
+
+        public double distance()
         {
             switch (weightType())
             {
-            default:
-            case EUC_2D:
-                return euclideanDistance();
-            case ATT:
-                return attDistance();
-            case GEO:
-                return geoDistance();
+                default:
+                case EUC_2D:
+                    return euclideanDistance();
+                case ATT:
+                    return attDistance();
+                case GEO:
+                    return geoDistance();
             }
         }
         
         /** Euclidean distance, rounded to the nearest integer. */
         private double euclideanDistance()
         {
-            return Math.rint(Math.sqrt(Math.pow(from[0] - to[0], 2) + Math.pow(from[1] - to[1], 2)));
+            final double dist = Math.sqrt(Math.pow(from[0] - to[0], 2) + Math.pow(from[1] - to[1], 2));
+
+            // TSPLIB's Euclidean distance metric rounds to the nearest integer.  Most (all?) TSPLIB benchmark tasks
+            // don't have distances small enough to be rounded down to zero.  We want to make sure that truly identical
+            // points have a distance of zero, but that different points have non-zero distance:
+            if (dist == 0.0)
+                return 0.0;
+            else return Math.max(1.0, Math.rint(dist));
         }
 
         /** A "pseudo-Euclidean" distance, used in some TSPLIB instances. */
@@ -238,6 +255,25 @@ public class TSPGraph {
             final double q2 = Math.cos(latitude(from) - latitude(to));
             final double q3 = Math.cos(latitude(from) + latitude(to));
             return (int) (rrr * Math.acos(0.5 * ((1.0 + q1)*q2 - (1.0 - q1)*q3) ) + 1.0);
+        }
+        
+        @Override
+        public void writeComponent(final EvolutionState state, final DataOutput output) throws IOException
+        {
+            assert(output != null);
+            output.writeInt(fromNode);
+            output.writeInt(toNode);
+            assert(repOK());
+        }
+        
+        @Override
+        public TSPComponent readComponent(final EvolutionState state, final DataInput input) throws IOException
+        {
+            assert(input != null);
+            final int fromNode = input.readInt();
+            final int toNode = input.readInt();
+            assert(repOK());
+            return new TSPComponent(fromNode, toNode);
         }
         
         public final boolean repOK()

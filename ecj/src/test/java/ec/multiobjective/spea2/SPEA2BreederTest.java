@@ -12,11 +12,15 @@ import ec.Initializer;
 import ec.Population;
 import ec.Subpopulation;
 import ec.multiobjective.MultiObjectiveFitness;
+import ec.select.TournamentSelection;
 import ec.util.MersenneTwisterFast;
 import ec.util.Output;
 import ec.util.Parameter;
 import ec.util.ParameterDatabase;
 import ec.vector.DoubleVectorIndividual;
+import ec.vector.FloatVectorSpecies;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -42,6 +46,7 @@ public class SPEA2BreederTest
     public void setUp()
         {
         state = new EvolutionState();
+        state.breedthreads = 1;
         state.output = Evolve.buildOutput();
         state.output.setThrowsErrors(true);
         state.parameters = new ParameterDatabase();
@@ -61,6 +66,9 @@ public class SPEA2BreederTest
         {
         final SPEA2Breeder instance = new SPEA2Breeder();
         instance.setup(state, BASE);
+        state.population = getTestPopulation();
+        final Population newpop = state.population.emptyClone();
+        instance.loadElites(state, newpop); // Must load elites before numElites() is called
         assertTrue(instance.usingElitism(0));
         assertEquals(10, instance.numElites(state, 0));
         }
@@ -231,6 +239,50 @@ public class SPEA2BreederTest
         assertTrue(state.population.subpops.get(0).individuals.containsAll(expectedArchive));
         }
     
+    /** If "elite-fraction" is set to 0.1, the archive size for a population of
+     * 20 should be 2. */
+    @Test
+    public void testLoadElites7()
+        {
+        state.parameters.remove(BASE.push(SPEA2Breeder.P_ELITE).push("0"));
+        state.parameters.set(BASE.push(SPEA2Breeder.P_ELITE_FRAC).push("0"), "0.1");
+        state.population = getTestPopulation();
+        assert(state.population.subpops.get(0).individuals.size() == 20);
+        final Population newpop = state.population.emptyClone();
+        final SPEA2Breeder instance = new SPEA2Breeder();
+        instance.setup(state, BASE);
+        instance.loadElites(state, newpop);
+        assertEquals(2, newpop.subpops.get(0).individuals.size());
+        assertEquals(2, state.population.subpops.get(0).individuals.size());
+        assertTrue(state.population.subpops.get(0).individuals.containsAll(newpop.subpops.get(0).individuals));
+        assertTrue(newpop.subpops.get(0).individuals.containsAll(state.population.subpops.get(0).individuals));
+        }
+    
+    /** The population size should be constant before and after breeding. */
+    @Test
+    public void testBreedPopulation1()
+        {
+        state.population = getTestPopulation();
+        final SPEA2Breeder instance = new SPEA2Breeder();
+        instance.setup(state, BASE);
+        final Population newpop = instance.breedPopulation(state);
+        assertEquals(20, newpop.subpops.get(0).individuals.size());
+        }
+    
+    /** When we use elite-frac, the population size should be constant before 
+     * and after breeding. */
+    @Test
+    public void testBreedPopulation2()
+        {
+        state.parameters.remove(BASE.push(SPEA2Breeder.P_ELITE).push("0"));
+        state.parameters.set(BASE.push(SPEA2Breeder.P_ELITE_FRAC).push("0"), "0.5");
+        state.population = getTestPopulation();
+        final SPEA2Breeder instance = new SPEA2Breeder();
+        instance.setup(state, BASE);
+        final Population newpop = instance.breedPopulation(state);
+        assertEquals(20, newpop.subpops.get(0).individuals.size());
+        }
+    
     /** Check the fitnesses after building an archive of size 10 with the
      * default k. */
     @Test
@@ -362,6 +414,11 @@ public class SPEA2BreederTest
            add(createTestIndividual(new double[] { 0, 0.25 }, 13));
            add(createTestIndividual(new double[] { 5, 0.23 }, 14));
         }};
+        
+        pop.subpops.get(0).species = new FloatVectorSpecies();
+        pop.subpops.get(0).species.pipe_prototype = new TournamentSelection();
+        ( (TournamentSelection)pop.subpops.get(0).species.pipe_prototype ).size = 2;
+        
         return pop;
         }
     
@@ -386,5 +443,22 @@ public class SPEA2BreederTest
         ind.fitness = fitness;
         ind.genome = new double[] { geneValue };
         return ind;
+        }
+    
+    /** When running the full SPEA2 algorithm, the population size should be
+     * the same size after calling evolve() as it was before.
+     */
+    @Test
+    public void testPopulationSize() throws IOException
+        {
+        final ParameterDatabase params = new ParameterDatabase(new File("src/main/resources/ec/app/moosuite/zdt6.params"));
+        final ParameterDatabase spea2_params = new ParameterDatabase(new File("src/main/resources/ec/app/moosuite/spea2.params"));
+        params.prependParent(spea2_params);
+        
+        final EvolutionState state = Evolve.initialize(params, 10000);
+        state.startFresh(); // Set up the initial population and stuff
+        assertEquals(150, state.population.subpops.get(0).individuals.size());
+        state.evolve(); // Run one generation
+        assertEquals(150, state.population.subpops.get(0).individuals.size());
         }
     }

@@ -12,6 +12,7 @@ import java.util.Map;
  */
 public class GnpGeneDescriptor implements Serializable {
 
+    private int id;//set and used by GnpSubnodeParameter to make it faster than by using HashMap
     private Class basicType;
     //mutation, crosover etc parameters
     private Map<String, String> parameters;
@@ -38,7 +39,9 @@ public class GnpGeneDescriptor implements Serializable {
 
         return dsc != null
                 && basicType.equals(dsc.getBasicType())
-                && parameters.equals(dsc.parameters);
+                && parameters.equals(dsc.parameters)
+                && id == dsc.id
+                ;
 
     }
 
@@ -51,7 +54,10 @@ public class GnpGeneDescriptor implements Serializable {
             additionalParameters.put(new String(entry.getKey()), new String(entry.getValue()));
         }
 
-        return new GnpGeneDescriptor(this.basicType, additionalParameters);
+        GnpGeneDescriptor newObj = new GnpGeneDescriptor(this.basicType, additionalParameters);
+        newObj.setId(id);
+
+        return newObj;
     }
 
     private Class getBasicType() {
@@ -60,5 +66,13 @@ public class GnpGeneDescriptor implements Serializable {
 
     public Map<String, String> getParameters() {
         return parameters;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

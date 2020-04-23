@@ -10,6 +10,8 @@ gnp.processingNodeCount = 2
 gnp.maxTime = 10
 gnp.judgementTime = 1
 gnp.processingTime = 5
+#start node count - usually 1. If more than 1, then evaluation will happen as many times as start nodes by re-setting processing time
+gnp.startNodeCount = 2
 
 # Subnode setup
 # ==============================

@@ -17,6 +17,7 @@ import ec.simple.SimpleFitness;
 import ec.simple.SimpleProblemForm;
 import ec.util.Parameter;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -317,16 +318,22 @@ public class AntGnp extends Problem implements SimpleProblemForm
 
         state.output.println("\n\nBest Individual's Stats\n=====================", log);
         ((GnpIndividual) ind).clearExecutionPaths();
-         state.output.println(((GnpIndividual)ind).stringOutputGenomeVsNetwork(), log);
-        //state.output.println("", log);
-        //state.output.println(((GnpIndividual)ind).graphOutputNetwork(), log);
+        state.output.println(((GnpIndividual)ind).stringOutputGenomeVsNetwork(), log);
+        state.output.println("", log);
+        state.output.println(((GnpIndividual)ind).graphOutputNetwork(), log);
+        state.output.println("", log);
 
         int prevMoves = 0;
         for(moves=0;moves<maxMoves && sum<food; ) {
-            List<GnpNodeEvaluationResult> executionPath = (((GnpIndividual) ind).evaluateDontLearnDontExplore(state, threadnum, this));
+            Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> executionPaths = (((GnpIndividual) ind).evaluateDontLearnDontExplore(state, threadnum, this));
             //state.output.println("", log);
             //state.output.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath), log);
-            state.output.println(((GnpIndividual)ind).graphOutputExecutionPath(executionPath), log);
+            state.output.println("", log);
+            for (Int2ObjectOpenHashMap.Entry  entry : executionPaths.int2ObjectEntrySet()) {
+                state.output.println("--- "  + String.valueOf(entry.getIntKey()), log);
+                state.output.println(((GnpIndividual) ind).graphOutputExecutionPath((List<GnpNodeEvaluationResult>) entry.getValue()), log);
+            }
+            state.output.println("", log);
             if (prevMoves == moves){
                 break;
             }
@@ -338,8 +345,10 @@ public class AntGnp extends Problem implements SimpleProblemForm
         //clear evaluation data
         ((GnpIndividual) ind).afterEvaluation();
 
-        for (List<GnpNodeEvaluationResult> executionPath : ((GnpIndividual) ind).getAllExecPaths()) {
-            state.output.println(((GnpIndividual) ind).stringOutputExecutionPath(executionPath), log);
+        for (Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> executionPaths : ((GnpIndividual) ind).getAllExecPaths()) {
+            for (Int2ObjectOpenHashMap.Entry  entry : executionPaths.int2ObjectEntrySet()) {
+                state.output.println(((GnpIndividual) ind).stringOutputExecutionPath((List<GnpNodeEvaluationResult>) entry.getValue()), log);
+            }
         }
 
         state.output.println("", log);

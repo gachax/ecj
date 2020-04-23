@@ -31,9 +31,9 @@ gnp.maxSubnodeCount = 2
 gnp.judgementFunction.count = 1
 gnp.judgementFunction.0 = ec.app.ant.gnpfunc.IfFoodAhead
 gnp.processingFunction.count = 3
-#gnp.processingFunction.0 = ec.app.ant.gnpfunc.Move
+gnp.processingFunction.0 = ec.app.ant.gnpfunc.Move
 # no reason to use delayed reward  - just to demonstrate the functionality
-gnp.processingFunction.0 = ec.app.ant.gnpfunc.DelayedRewardMove
+#gnp.processingFunction.0 = ec.app.ant.gnpfunc.DelayedRewardMove
 gnp.processingFunction.1 = ec.app.ant.gnpfunc.Left
 gnp.processingFunction.2 = ec.app.ant.gnpfunc.Right
 
@@ -44,3 +44,29 @@ stat.file = $out_gnp_ant.stat
 stat.do-per-generation-description = false
 
 gnp.storeAllExecPaths = false
+
+# evaluator using executor service for multiple threads
+eval = ec.simple.SimpleEvaluatorWithExecutors
+
+evalthreads = 1
+breedthreads = 1
+seed.0 = 121377348
+seed.1 = time
+seed.2 = time
+seed.3 = time
+seed.4 = time
+seed.5 = time
+seed.6 = time
+seed.7 = time
+seed.8 = time
+seed.9 = time
+seed.10 = time
+seed.11 = time
+seed.12 = time
+seed.13 = time
+seed.14 = time
+seed.15 = time
+seed.16 = time
+seed.17 = time
+seed.18 = time
+seed.19 = time

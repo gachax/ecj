@@ -32,6 +32,7 @@ public class GnpInitializer extends SimpleInitializer {
     private int maxSubnodeCount = 0;
     private int maxSubnodeCountMultiplyer = 0;
     private boolean startWithJudgement = false;
+    private int startNodeCount;
     private int nodeCount = 0;
     private int totalSubnodeParametersGeneCount = 0;
     private int totalNodeGeneCount = 0;
@@ -43,6 +44,7 @@ public class GnpInitializer extends SimpleInitializer {
     private int maxBranchCount = 0;
     private int maxBranchCountMultiplyer = 0;
     private boolean storeAllExecPaths;
+    private boolean positiveQPathsOnly;
 
     //All custom subnode parameter genes
     private Map<GnpGeneDescriptor, Object> subnodeParameterGeneDescriptors = new LinkedHashMap<>();
@@ -67,6 +69,7 @@ public class GnpInitializer extends SimpleInitializer {
     private static final String P_PROCESSING_TIME = "processingTime";
     private static final String P_JUDGEMENT_NODE_COUNT = "judgementNodeCount";
     private static final String P_PROCESSING_NODE_COUNT = "processingNodeCount";
+    private static final String P_START_NODE_COUNT = "startNodeCount";
     private static final String P_MAX_SUBNODE_COUNT = "maxSubnodeCount";
     private static final String P_START_WITH_JUDGEMENT = "startWithJudgement";
     private static final String P_SUBNODE_PARAMETERS = "subnodeParameters";
@@ -81,6 +84,7 @@ public class GnpInitializer extends SimpleInitializer {
     private static final String P_REWARD_DISTRIBUTOR = "rewardDistributor";
     private static final String P_SUBNODE_SELECTION = "subnodeSelection";
     private static final String P_STORE_ALL_EXEC_PATHS = "storeAllExecPaths";
+    private static final String P_POSITIVE_Q_PATHS_ONLY = "positiveQPathsOnly";
 
     private static final String P_VECTOR_SPECIES_SEGMENT = "vector.species.segment";
     //properties of the segments of the node, subnode and branch genes. They are set up in properties file:
@@ -123,6 +127,7 @@ public class GnpInitializer extends SimpleInitializer {
         processingTime = state.parameters.getInt(defaultBase.push(P_PROCESSING_TIME), null);
         judgementNodeCount = state.parameters.getInt(defaultBase.push(P_JUDGEMENT_NODE_COUNT), null);
         processingNodeCount = state.parameters.getInt(defaultBase.push(P_PROCESSING_NODE_COUNT), null);
+        startNodeCount = state.parameters.getInt(defaultBase.push(P_START_NODE_COUNT), null);
         maxSubnodeCount = state.parameters.getInt(defaultBase.push(P_MAX_SUBNODE_COUNT), null);
         maxSubnodeCountMultiplyer = getMultiplyer(maxSubnodeCount);
         startWithJudgement = state.parameters.getBoolean(defaultBase.push(P_START_WITH_JUDGEMENT), null, false);
@@ -131,6 +136,7 @@ public class GnpInitializer extends SimpleInitializer {
         judgementFunctionCount = state.parameters.getInt(defaultBase.push(P_JUDGEMENT_FUNCTION).push(P_COUNT), null);
         processingFunctionCount = state.parameters.getInt(defaultBase.push(P_PROCESSING_FUNCTION).push(P_COUNT), null);
         storeAllExecPaths = state.parameters.getBoolean(defaultBase.push(P_STORE_ALL_EXEC_PATHS), null,false);
+        positiveQPathsOnly = state.parameters.getBoolean(defaultBase.push(P_POSITIVE_Q_PATHS_ONLY), null,false);
 
         //total count of the nodes
         nodeCount = judgementNodeCount + processingNodeCount;
@@ -505,6 +511,10 @@ public class GnpInitializer extends SimpleInitializer {
         return maxSubnodeCount;
     }
 
+    public int getStartNodeCount() {
+        return startNodeCount;
+    }
+
     public Int2ObjectOpenHashMap<int[]> getSubnodeGeneMap() {
         return subnodeGeneMap;
     }
@@ -563,5 +573,9 @@ public class GnpInitializer extends SimpleInitializer {
 
     public int getSubnodeParemetersCount() {
         return subnodeParemetersCount;
+    }
+
+    public boolean isPositiveQPathsOnly() {
+        return positiveQPathsOnly;
     }
 }

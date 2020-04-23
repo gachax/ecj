@@ -162,6 +162,11 @@ public class TSPProblem extends Problem implements SimpleProblemForm, Constructi
     }
 
     @Override
+    public List<Component> getAllComponents() {
+        return new ArrayList<Component>(graph.getAllEdges());
+    }
+    
+    @Override
     public List<Component> getAllowedComponents(final ConstructiveIndividual partialSolution) {
         assert(partialSolution != null);
         
@@ -179,7 +184,7 @@ public class TSPProblem extends Problem implements SimpleProblemForm, Constructi
                     allowedComponents.add(edge);
         }
         else
-        { // Otherwise, only edges extending from either end of the paht are allowed
+        { // Otherwise, only edges extending from either end of the path are allowed
             // Focus on the most recently added node in the tour
             final int mostRecentNode = tspSol.getLastNodeVisited();
             assert(mostRecentNode == tspSol.get((int) partialSolution.size() - 1).to());
@@ -230,23 +235,33 @@ public class TSPProblem extends Problem implements SimpleProblemForm, Constructi
         
         if (!ind.evaluated)
             {
-            final TSPIndividual tind = (TSPIndividual) ind;
-            if (!isCompleteSolution(tind))
-                state.output.fatal(String.format("%s: attempted to evaluate an incomplete solution.", this.getClass().getSimpleName()));
-            assert(tind.size() == graph.numNodes() - 1);
-            final List<TSPComponent> components = tind.getComponents();
-            double cost = 0.0;
-            for (final TSPComponent c : tind.getComponents())
-                cost += c.cost();
-            // The edge connecting the end to the beginning is implicit, so we add it here
-            assert(components.get(components.size() - 1).to() != components.get(0).from()); 
-            cost += graph.getEdge(components.get(components.size() - 1).to(), components.get(0).from()).cost();
-            assert(cost >= 0.0);
-            assert(!Double.isNaN(cost));
-            assert(!Double.isInfinite(cost));
-            ((SimpleFitness)ind.fitness).setFitness(state, cost, false);
+            final double fitness = 1.0/totalDistance(state, ind);
+            ((SimpleFitness)ind.fitness).setFitness(state, fitness, false);
             ind.evaluated = true;
             }
+    }
+
+    private double totalDistance(final EvolutionState state, final Individual ind)
+    {
+        final TSPIndividual tind = (TSPIndividual) ind;
+        assert(ind != null);
+        if (!isCompleteSolution(tind))
+            state.output.fatal(String.format("%s: attempted to evaluate an incomplete solution.", this.getClass().getSimpleName()));
+        assert(tind.size() == graph.numNodes() - 1);
+        final List<TSPComponent> components = tind.getComponents();
+
+        double distance = 0.0;
+        for (final TSPComponent c : tind.getComponents())
+            distance += c.distance();
+
+        // The edge connecting the end to the beginning is implicit, so we add it here
+        assert(components.get(components.size() - 1).to() != components.get(0).from());
+        distance += graph.getEdge(components.get(components.size() - 1).to(), components.get(0).from()).distance();
+
+        assert(distance >= 0.0);
+        assert(!Double.isNaN(distance));
+        assert(!Double.isInfinite(distance));
+        return distance;
     }
 
     @Override

@@ -14,11 +14,13 @@ import java.io.IOException;
 
 public class TestAntGPvsGNP {
 
-    private final String antGpParamsFilePath = System.getProperty("user.dir") + "/ecj//src/main/resources/ec/app/ant/ant.params";
-    private final String antGnpParamsFilePath = System.getProperty("user.dir") + "/ecj//src/main/resources/ec/app/ant/gnp.params";
+    private final String antGpParamsFilePath = System.getProperty("user.dir") + "/ecj/src/main/resources/ec/app/ant/ant.params";
+    private final String antGnpParamsFilePath = System.getProperty("user.dir") + "/ecj/src/main/resources/ec/app/ant/gnp.params";
+    private final String antGnp2ParamsFilePath = System.getProperty("user.dir") + "/ecj/src/main/resources/ec/app/ant/gnpTwoStartNodes.params";
 
     private EvolutionState antGpState;
     private EvolutionState antGnpState;
+    private EvolutionState antGnpState2NetworkStartNodes;
 
     @Before
     public void setup() throws IOException {
@@ -36,6 +38,11 @@ public class TestAntGPvsGNP {
         //out2.getLog(0).silent = true;
         //out2.getLog(1).silent = true;
         antGnpState = Evolve.initialize(dbase2, 0, out);
+
+        //Initialize everything without running the evolution
+        ParameterDatabase dbase3 = new ParameterDatabase(new File(antGnp2ParamsFilePath));
+        Output out3 = Evolve.buildOutput();
+        antGnpState2NetworkStartNodes = Evolve.initialize(dbase3, 0, out);
 
     }
 
@@ -57,6 +64,13 @@ public class TestAntGPvsGNP {
     public  void runAntGnp(){
 
         antGnpState.run(EvolutionState.C_STARTED_FRESH);
+
+    }
+
+    @Test
+    public  void runAntGnp2NetworkStartNodes(){
+
+        antGnpState2NetworkStartNodes.run(EvolutionState.C_STARTED_FRESH);
 
     }
 

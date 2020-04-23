@@ -99,7 +99,7 @@ public class SimpleShortStatistics extends Statistics
         
     public int statisticslog = 0;  // stdout by default
     public int modulus;
-    public String delimiter;
+    public String delimiter = " ";
     public boolean doSize;
     public boolean doTime;
     public boolean doSubpops;
@@ -123,7 +123,6 @@ public class SimpleShortStatistics extends Statistics
             base.push(P_STATISTICS_FILE),null);
 
         modulus = state.parameters.getIntWithDefault(base.push(P_STATISTICS_MODULUS), null, 1);
-        delimiter = state.parameters.getStringWithDefault(base.push(P_DELIMITER), null, " ");
 
         if (silentFile)
             {
@@ -269,20 +268,18 @@ public class SimpleShortStatistics extends Statistics
 
     /** Prints out the statistics, but does not end with a println --
         this lets overriding methods print additional statistics on the same line */
-    public void postEvaluationStatistics(final EvolutionState state)
-        {
+    public void postEvaluationStatistics(final EvolutionState state) {
         super.postEvaluationStatistics(state);
-        
+
         boolean output = (state.generation % modulus == 0);
 
         // gather timings
-        if (output && doTime)
-            {
+        if (output && doTime) {
             Runtime r = Runtime.getRuntime();
-            long curU =  r.totalMemory() - r.freeMemory();          
-            state.output.print(delimiter + (System.currentTimeMillis()-lastTime),  statisticslog);
-            }
-                        
+            long curU = r.totalMemory() - r.freeMemory();
+            state.output.print(delimiter + (System.currentTimeMillis() - lastTime), statisticslog);
+        }
+
         int subpops = state.population.subpops.size();                          // number of supopulations
         totalIndsThisGen = new long[subpops];                                           // total assessed individuals
         bestOfGeneration = new Individual[subpops];                                     // per-subpop best individual this generation
@@ -294,11 +291,12 @@ public class SimpleShortStatistics extends Statistics
         prepareStatistics(state);
 
         // gather per-subpopulation statistics
-                
+        boolean somethingevaluated = false;
         for(int x=0;x<subpops;x++)
-            {                   
+            {
             for(int y = 0; y< state.population.subpops.get(x).individuals.size(); y++)
                 {
+
                 if (state.population.subpops.get(x).individuals.get(y).evaluated)               // he's got a valid fitness
                     {
                     // update sizes
@@ -322,6 +320,7 @@ public class SimpleShortStatistics extends Statistics
                                         
                     // hook for KozaShortStatistics etc.
                     gatherExtraSubpopStatistics(state, x, y);
+                    somethingevaluated = true;
                     }
                 }
             // compute mean fitness stats
@@ -350,7 +349,7 @@ public class SimpleShortStatistics extends Statistics
             // hook for KozaShortStatistics etc.
             if (output && doSubpops) printExtraSubpopStatisticsAfter(state, x);
             }
-  
+            if(!somethingevaluated) { state.output.fatal("There are no individuals with a valid fitness; Cannot compute best-so-far statistics"); }
   
   
         // Now gather per-Population statistics
@@ -370,10 +369,10 @@ public class SimpleShortStatistics extends Statistics
             popTotalSize += totalSizeThisGen[x];
             popTotalSizeSoFar += totalSizeSoFar[x];
             popTotalFitness += totalFitnessThisGen[x];
-            if (bestOfGeneration[x] != null && (popBestOfGeneration == null || bestOfGeneration[x].fitness.betterThan(popBestOfGeneration.fitness)))
-                popBestOfGeneration = bestOfGeneration[x];
+	    if (bestOfGeneration[x] != null && (popBestOfGeneration == null || bestOfGeneration[x].fitness.betterThan(popBestOfGeneration.fitness)))
+	    	popBestOfGeneration = bestOfGeneration[x];
             if (bestSoFar[x] != null && (popBestSoFar == null || bestSoFar[x].fitness.betterThan(popBestSoFar.fitness)))
-                popBestSoFar = bestSoFar[x];
+		popBestSoFar = bestSoFar[x];
 
             // hook for KozaShortStatistics etc.
             gatherExtraPopStatistics(state, x);
@@ -398,7 +397,7 @@ public class SimpleShortStatistics extends Statistics
         if (output)
             {
             state.output.print(delimiter + popMeanFitness , statisticslog);                                                                                  // mean fitness of pop this gen
-            state.output.print(delimiter + (double)(popBestOfGeneration.fitness.fitness()) , statisticslog);                 // best fitness of pop this gen
+	        state.output.print(delimiter + (double)(popBestOfGeneration.fitness.fitness()) , statisticslog);                 // best fitness of pop this gen
             state.output.print(delimiter + (double)(popBestSoFar.fitness.fitness()) , statisticslog);                // best fitness of pop so far
             }
                         

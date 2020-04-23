@@ -28,6 +28,11 @@ gnp.maxTime = 5
 gnp.judgementTime = 1
 gnp.processingTime = 5
 gnp.startWithJudgement = false
+#start node count - usually 1. If more than 1, then evaluation will happen as many times as start nodes by re-setting processing time
+gnp.startNodeCount = 1
+
+#If true, only positive Q nodes will be executed (except when exploring), i.e. if negative Q met - time will run out
+gnp.positiveQPathsOnly = true
 
 # Subnode setup
 # ==============================

@@ -47,6 +47,8 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
 
     }
 
+
+
     public Object copy(double[] genome) {
 
         GnpNode myobj = init.newGnpNodeInstance();
@@ -126,6 +128,10 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
         GnpSubnode subnode = init.getSubnodeSelector().select(subnodes, maxQValuedSubnode, thread, explore, exploringProbability);
 
         GnpFunctionResult result;
+
+        if (!explore && subnode.getQ() < 0 && init.isPositiveQPathsOnly()) {
+            return null;
+        }
 
         GnpFunction function = null;
 

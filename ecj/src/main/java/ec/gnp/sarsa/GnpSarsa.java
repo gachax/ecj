@@ -29,8 +29,14 @@ public class GnpSarsa implements GnpRewardDistributor {
         //set reward to the current subnode
         reward.getSubnode().setQ(reward.getReward());
 
-        if (reward.getExecutionPathUntilReward() != null && !reward.getExecutionPathUntilReward().isEmpty() && reward.getEvaluationId() > 0) {
-            previousSubnode = reward.getExecutionPathUntilReward().get(reward.getEvaluationId() - 1).getEvaluatedSubnode();
+        if (reward.getExecutionPathUntilReward() != null && !reward.getExecutionPathUntilReward().isEmpty()) {
+
+            int firstEvaluationIdOfThePath = reward.getExecutionPathUntilReward().get(0).getEvaluationId();
+
+            if (reward.getEvaluationId() > firstEvaluationIdOfThePath) {
+                previousSubnode = reward.getExecutionPathUntilReward().get(reward.getEvaluationId() - 1 - firstEvaluationIdOfThePath).getEvaluatedSubnode();
+            }
+
         }
 
         if (previousSubnode != null) {
