@@ -86,6 +86,7 @@ public class GnpInitializer extends SimpleInitializer {
     private static final String P_STORE_ALL_EXEC_PATHS = "storeAllExecPaths";
     private static final String P_POSITIVE_Q_PATHS_ONLY = "positiveQPathsOnly";
 
+
     private static final String P_VECTOR_SPECIES_SEGMENT = "vector.species.segment";
     //properties of the segments of the node, subnode and branch genes. They are set up in properties file:
     //gnp.subnodeCountSegment
@@ -108,20 +109,19 @@ public class GnpInitializer extends SimpleInitializer {
         return GnpDefaults.base();
     }
 
-    public SplittableRandom random[];
+    private RandomGenerators randomGenerators;
 
     @Override
     public void setup(final EvolutionState state, final Parameter base) {
 
         super.setup(state, base);
 
-        setupRandomGenerators(state);
-
         Parameter defaultBase = defaultBase();
+
+        randomGenerators = new RandomGenerators(state, defaultBase);
 
         subnodeParametersParameter = defaultBase.push(P_SUBNODE_PARAMETERS);
 
-        //load parameters
         maxTime = state.parameters.getInt(defaultBase.push(P_MAX_TIME), null);
         judgementTime = state.parameters.getInt(defaultBase.push(P_JUDGEMENT_TIME), null);
         processingTime = state.parameters.getInt(defaultBase.push(P_PROCESSING_TIME), null);
@@ -187,16 +187,6 @@ public class GnpInitializer extends SimpleInitializer {
         setupSegments(state);
         setupGeneMap();
         setupObjectTemplates(state, subnodeParametersParameter);
-
-    }
-
-    private void setupRandomGenerators(EvolutionState state) {
-
-        random = new SplittableRandom[state.breedthreads > state.evalthreads ? state.breedthreads : state.evalthreads];
-        int time = (int)(System.currentTimeMillis());
-        for (int i =0; i < random.length; i++) {
-            random[i] = new SplittableRandom(Evolve.determineSeed(state.output, state.parameters, new Parameter(Evolve.P_SEED).push("" + i),time + i, random.length * state.randomSeedOffset, false));
-        }
 
     }
 
@@ -577,5 +567,9 @@ public class GnpInitializer extends SimpleInitializer {
 
     public boolean isPositiveQPathsOnly() {
         return positiveQPathsOnly;
+    }
+
+    public RandomGenerators getRandomGenerators() {
+        return randomGenerators;
     }
 }

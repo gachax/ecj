@@ -4,7 +4,6 @@ import ec.EvolutionState;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Node in the Genetic Network/graph. Node contains of the subnodes (GnpSubnode) and branches (GnpBranch) to other nodes.
@@ -115,15 +114,15 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
      * @param additionalParameters additional parameters passed from the Problem
      * @return GnpNodeEvaluationResult
      */
-    public GnpNodeEvaluationResult evaluate( final EvolutionState state,
-                                             GnpIndividual individual,
-                                             ObjectArrayList<GnpNodeEvaluationResult> executionPath,
-                                             int totalEvaluationCount,
-                                             int thread,
-                                             boolean learn,
-                                             boolean explore,
-                                             Double exploringProbability,
-                                             Object ... additionalParameters) {
+    public synchronized GnpNodeEvaluationResult evaluate(final EvolutionState state,
+                                                         GnpIndividual individual,
+                                                         ObjectArrayList<GnpNodeEvaluationResult> executionPath,
+                                                         int totalEvaluationCount,
+                                                         int thread,
+                                                         boolean learn,
+                                                         boolean explore,
+                                                         Double exploringProbability,
+                                                         Object ... additionalParameters) {
 
         GnpSubnode subnode = init.getSubnodeSelector().select(subnodes, maxQValuedSubnode, thread, explore, exploringProbability);
 

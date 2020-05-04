@@ -58,4 +58,5 @@ public class GnpReward {
     public int getEvaluationId() {
         return evaluationId;
     }
+
 }

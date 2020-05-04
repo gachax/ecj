@@ -64,12 +64,12 @@ public class GnpNetwork  implements Serializable {
             for (int i = 0; i < this.startNodeIds.length; i++) {
 
                 if (this.startNodeIds[i] == -1) {
-                    this.startNodeIds[i] = init.random[0].nextInt(init.getNodeCount());
+                    this.startNodeIds[i] = init.getRandomGenerators().nextInt(0, init.getNodeCount());
                 }
 
                 if (init.isStartWithJudgement()) {
                     while (nodeTypes.get(this.startNodeIds[i]) != GnpNode.JUDGEMENT_NODE) {
-                        this.startNodeIds[i] = init.random[0].nextInt(init.getNodeCount());
+                        this.startNodeIds[i] = init.getRandomGenerators().nextInt(0, init.getNodeCount());
                     }
                 }
 
@@ -117,9 +117,9 @@ public class GnpNetwork  implements Serializable {
         //set random judgement nodes
         for (int j = 0; j < init.getJudgementNodeCount(); j++) {
 
-            int id = init.random[0].nextInt(init.getNodeCount());
+            int id = init.getRandomGenerators().nextInt(0,init.getNodeCount());
             while (nodeTypes.containsKey(id)) {
-                id = init.random[0].nextInt(init.getNodeCount());
+                id = init.getRandomGenerators().nextInt(0,init.getNodeCount());
             }
             nodeTypes.put(id , GnpNode.JUDGEMENT_NODE);
 
@@ -145,17 +145,6 @@ public class GnpNetwork  implements Serializable {
         }
 
         return networkChanged;
-    }
-
-    private int getRandomWithExclusion(final EvolutionState state, int thread, int start, int end, int... exclude) {
-        int random = start + init.random[thread].nextInt(end - start + 1 - exclude.length);
-        for (int ex : exclude) {
-            if (random < ex) {
-                break;
-            }
-            random++;
-        }
-        return random;
     }
 
     private int getSubnodeAttributesMapKey(int nodeId, int subNodeId) {
@@ -214,11 +203,10 @@ public class GnpNetwork  implements Serializable {
     /**
      * Generated the network (fills networkNodes list with new node instances).
      * @param state EvolutionState
-     * @param thread thread number
      * @param genome genome of the GnpIndividual
      * @param skipFunctionChangedCall in case individual is read in, the call of the subnode's hook (afterSubnodeFunctionChanged) is not needed
      */
-    public void generateNetwork(final EvolutionState state, int thread, double[] genome, boolean skipFunctionChangedCall) {
+    public void generateNetwork(final EvolutionState state, double[] genome, boolean skipFunctionChangedCall) {
 
         if (networkChanged(genome)) {
 
@@ -291,7 +279,7 @@ public class GnpNetwork  implements Serializable {
 
                             GnpBranch branch = new GnpBranch(b + (sub * init.getFunctionLibrary().getMaxJudgementResultCount()), genome, init.getBranchesGeneMap().get(init.getBranchGeneMapKey(n, b + (sub * init.getFunctionLibrary().getMaxJudgementResultCount())))[0]);
 
-                            validateAndModifyTheBranch(state, thread, node, branch, branchedNodes);
+                            validateAndModifyTheBranch(node, branch, branchedNodes);
 
                             if (init.getMaxBranchCount() < init.getNodeCount()){
                                 branchedNodes.add(branch.getConnectedNodeId());
@@ -308,7 +296,7 @@ public class GnpNetwork  implements Serializable {
 
                         GnpBranch branch = new GnpBranch(0 + sub, genome, init.getBranchesGeneMap().get(init.getBranchGeneMapKey(n, sub))[0]);
 
-                        validateAndModifyTheBranch(state, thread, node, branch, branchedNodes);
+                        validateAndModifyTheBranch(node, branch, branchedNodes);
 
                         if (init.getMaxBranchCount() < init.getNodeCount()){
                             branchedNodes.add(branch.getConnectedNodeId());
@@ -331,27 +319,18 @@ public class GnpNetwork  implements Serializable {
 
     //loops are not allowed, so reset the gene and make sure the branch of the node doesn't point to the node
     //Also, in case there are more nodes than branches, exclude already used nodes, so each branch points to a different node
-    private void validateAndModifyTheBranch(EvolutionState state, int thread, GnpNode node, GnpBranch branch, IntArrayList usedNodes) {
+    private void validateAndModifyTheBranch(GnpNode node, GnpBranch branch, IntArrayList usedNodes) {
 
-        IntArrayList nodesToExclude = new IntArrayList();
+        if ((usedNodes != null && usedNodes.contains(branch.getConnectedNodeId())) || branch.getConnectedNodeId() == node.getId()){
 
-        if (!usedNodes.isEmpty()) {
-
-            nodesToExclude.addAll(usedNodes);
-
-        }
-
-        nodesToExclude.add(node.getId());
-
-        Collections.sort(nodesToExclude);
-
-        if (usedNodes.contains(branch.getConnectedNodeId()) || branch.getConnectedNodeId() == node.getId()){
-
-            branch.setConnectedNodeId(getRandomWithExclusion(state,
-                    thread,
-                    Integer.valueOf(init.getConnectionsSegmentProperites().get(GnpInitializer.P_MIN_GENE)),
-                    Integer.valueOf(init.getConnectionsSegmentProperites().get(GnpInitializer.P_MAX_GENE)),
-                    nodesToExclude.stream().mapToInt(i -> i).toArray()));
+            //get the first available node
+            for (int i = Integer.parseInt(init.getConnectionsSegmentProperites().get(GnpInitializer.P_MIN_GENE));
+            i <= Integer.parseInt(init.getConnectionsSegmentProperites().get(GnpInitializer.P_MAX_GENE)); i++) {
+                if ((usedNodes == null || !usedNodes.contains(i)) && i != node.getId()) {
+                    branch.setConnectedNodeId(i);
+                    break;
+                }
+            }
 
         }
 

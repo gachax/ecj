@@ -45,7 +45,7 @@ public class GnpEgreedy implements GnpSubnodeSelector{
         }
 
         //if(state.random[thread].nextDouble() < 1 - eGreedyEpsilonL) {
-        if(((GnpInitializer)state.initializer).random[thread].nextDouble() < 1 - eGreedyEpsilonL) {
+        if(((GnpInitializer)state.initializer).getRandomGenerators().nextDouble(thread) < 1 - eGreedyEpsilonL) {
 
             if (maxQValuedSubnode != null) {
 
@@ -73,7 +73,7 @@ public class GnpEgreedy implements GnpSubnodeSelector{
         } else {
 
             //resultingSubnode = subnodes.get(state.random[thread].nextInt(subnodes.size()));
-            resultingSubnode = subnodes.get(((GnpInitializer)state.initializer).random[thread].nextInt(subnodes.size()));
+            resultingSubnode = subnodes.get(((GnpInitializer)state.initializer).getRandomGenerators().nextInt(thread, subnodes.size()));
 
         }
 

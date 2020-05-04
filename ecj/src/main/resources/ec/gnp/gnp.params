@@ -5,6 +5,10 @@ parent.0 = ../simple/simple.params
 # ==============================
 init = ec.gnp.GnpInitializer
 
+# Random
+# if true, then SplittableRandom is used which is much faster
+gnp.useSplittableRandom = true
+
 # Species
 # ==============================
 pop.subpop.0.species = ec.vector.FloatVectorSpecies
@@ -50,8 +54,8 @@ gnp.subnodeParameters.0 = ?
 gnp.subnodeParameters.1 = ?
 
 # Reward distribution class
-gnp.rewardDistributor = ec.gnp.sarsa.GnpSarsaWithEligibilityTraces
-#gnp.rewardDistributor = ec.gnp.sarsa.GnpSarsa
+#gnp.rewardDistributor = ec.gnp.sarsa.GnpSarsaWithEligibilityTraces
+gnp.rewardDistributor = ec.gnp.sarsa.GnpSarsa
 # The learning rate (alpha) determines to what extent the newly acquired information will override the old information. A factor of 0 will make the agent not learn anything, while a factor of 1 would make the agent consider only the most recent information.
 gnp.rewardDistributor.sarsa.alpha = 0.1
 # The discount factor (gamma) determines the importance of future rewards. A factor of 0 will make the agent "opportunistic" by only considering current rewards, while a factor approaching 1 will make it strive for a long-term high reward. If the discount factor meets or exceeds 1, the Q values may diverge.

@@ -1,5 +1,7 @@
 package ec.gnp;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Evaluating the node returns this result, containing all the necessary information for the further process.
  *
