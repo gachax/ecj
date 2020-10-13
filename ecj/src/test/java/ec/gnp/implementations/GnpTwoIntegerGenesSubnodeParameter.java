@@ -11,6 +11,14 @@ public class GnpTwoIntegerGenesSubnodeParameter extends GnpSubnodeParameter {
     private GnpGeneDescriptor intGene1;
     private GnpGeneDescriptor intGene2;
 
+    public GnpTwoIntegerGenesSubnodeParameter() {
+    }
+
+    public GnpTwoIntegerGenesSubnodeParameter(GnpGeneDescriptor intGene1, GnpGeneDescriptor intGene2) {
+        this.intGene1 = intGene1;
+        this.intGene2 = intGene2;
+    }
+
     public int getI1() {
         return getIntGeneValue(intGene1);
     }
@@ -19,10 +27,9 @@ public class GnpTwoIntegerGenesSubnodeParameter extends GnpSubnodeParameter {
         return getIntGeneValue(intGene2);
     }
 
-    public Object copy(double[] genome) {
-        GnpTwoIntegerGenesSubnodeParameter newObj = new GnpTwoIntegerGenesSubnodeParameter();
-        newObj.setup(id, genome, startGene, state);
-        return newObj;
+    @Override
+    public GnpSubnodeParameter newInstance() {
+        return new GnpTwoIntegerGenesSubnodeParameter(intGene1, intGene2);
     }
 
     @Override

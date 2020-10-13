@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A genome based parameter for the GnpSubnode. This means parameters undergo the evolution process of mutations etc. and are passed to the GnpFunciton of the GnpSubnode being evaluated.
@@ -48,18 +49,28 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
         if (genome != null) {
 
             localGenome = new double[genes.size()];
-            /*
-            for (int i = 0; i < genes.size(); i++){
-                localGenome[i] = genome[startGene + i];
-            }
-            */
             System.arraycopy(genome, startGene, localGenome, 0, genes.size());
 
         }
 
     }
 
-    public abstract Object copy(double[] genome);
+    public GnpSubnodeParameter copy(double[] genome) {
+
+        GnpSubnodeParameter newObj = newInstance();
+
+        newObj.id = id;
+        newObj.genome = genome;
+        newObj.startGene = startGene;
+        newObj.state = state;
+        newObj.genes = genes;
+        newObj.setupLocalGenome();
+
+        return newObj;
+
+    }
+
+    public abstract GnpSubnodeParameter newInstance();
 
     /**
      * GnpIndividual is based on DoubleVectorIndividual, so it supports the same mutations and boundries according to the type of the gene (int or double).
@@ -72,8 +83,8 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
      * @return the value of the int based gene
      */
     protected int getIntGeneValue(GnpGeneDescriptor gnpGeneDescriptor) {
-        //return (int) localGenome[genes.getInt(gnpGeneDescriptor)];
-        return (int) localGenome[gnpGeneDescriptor.getId()];
+        return (int) localGenome[genes.getInt(gnpGeneDescriptor)];
+        //return (int) localGenome[gnpGeneDescriptor.getId()];
     }
 
     /**
@@ -82,8 +93,8 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
      * @return the value of the double based gene
      */
     protected double getDoubleGeneValue(GnpGeneDescriptor gnpGeneDescriptor) {
-        //return localGenome[genes.getInt(gnpGeneDescriptor)];
-        return localGenome[gnpGeneDescriptor.getId()];
+        return localGenome[genes.getInt(gnpGeneDescriptor)];
+        //return localGenome[gnpGeneDescriptor.getId()];
     }
 
     private void setValue(double value, int geneIndex) {
@@ -104,7 +115,6 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
     protected void addGene(GnpGeneDescriptor gnpGeneDescriptor){
 
         int id = genes.size();
-        gnpGeneDescriptor.setId(id);
         genes.put(gnpGeneDescriptor, id);
 
     }
