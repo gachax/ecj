@@ -513,136 +513,139 @@ public class FloatVectorSpecies extends VectorSpecies
         System.out.println("Min: " + minGene[i] + ", Max: " + maxGene[i]);
         */
         }
-    
-    
-    
-    protected void loadParametersForGene(EvolutionState state, int index, Parameter base, Parameter def, String postfix)
-        {       
-        super.loadParametersForGene(state, index, base, def, postfix);
-        
-        double minVal = state.parameters.getDoubleWithDefault(base.push(P_MINGENE).push(postfix), def.push(P_MINGENE).push(postfix), Double.NaN);
-        if (minVal == minVal)  // it's not NaN
-            {                        
-            //check if the value is in range
-            if (!inNumericalTypeRange(minVal))
-                state.output.fatal("Min Gene Value out of range for data type " + i_prototype.getClass().getName(),
-                    base.push(P_MINGENE).push(postfix), 
-                    base.push(P_MINGENE).push(postfix));
-            else minGene[index] = minVal;
 
-            if (dynamicInitialSize)
-                state.output.warnOnce("Using dynamic initial sizing, but per-gene or per-segment min-gene declarations.  This is probably wrong.  You probably want to use global min/max declarations.",
-                    base.push(P_MINGENE).push(postfix), 
-                    base.push(P_MINGENE).push(postfix));
-            }
-            
-        double maxVal = state.parameters.getDoubleWithDefault(base.push(P_MAXGENE).push(postfix), def.push(P_MAXGENE).push(postfix), Double.NaN);
-        if (maxVal == maxVal)  // it's not NaN
-            {                        
-            //check if the value is in range
-            if (!inNumericalTypeRange(maxVal))
-                state.output.fatal("Max Gene Value out of range for data type " + i_prototype.getClass().getName(),
-                    base.push(P_MAXGENE).push(postfix), 
-                    base.push(P_MAXGENE).push(postfix));
-            else maxGene[index] = maxVal;
-
-            if (dynamicInitialSize)
-                state.output.warnOnce("Using dynamic initial sizing, but per-gene or per-segment max-gene declarations.  This is probably wrong.  You probably want to use global min/max declarations.",
-                    base.push(P_MAXGENE).push(postfix), 
-                    base.push(P_MAXGENE).push(postfix));
-            }
-        
-        if ((maxVal == maxVal && !(minVal == minVal)))
-            state.output.warning("Max Gene specified but not Min Gene", base.push(P_MINGENE).push(postfix), def.push(P_MINGENE).push(postfix));
-                
-        if ((minVal == minVal && !(maxVal == maxVal)))
-            state.output.warning("Min Gene specified but not Max Gene", base.push(P_MAXGENE).push(postfix), def.push(P_MINGENE).push(postfix));
+        protected void loadParametersForGene(EvolutionState state, int index, Parameter base, Parameter def, String postfix) {
+            loadParametersForGeneNoSync(state, index, base, def, postfix, state.parameters);
+        }
 
 
-        /// MUTATION
-                   
-        String mtype = state.parameters.getStringWithDefault(base.push(P_MUTATIONTYPE).push(postfix), def.push(P_MUTATIONTYPE).push(postfix), null);
-        int mutType = -1;
-        if (mtype == null) { }  // we're cool
-        else if (mtype.equalsIgnoreCase(V_RESET_MUTATION))
-            mutType = mutationType[index] = C_RESET_MUTATION; 
-        else if (mtype.equalsIgnoreCase(V_POLYNOMIAL_MUTATION))
-            mutType = mutationType[index] = C_POLYNOMIAL_MUTATION;
-        else if (mtype.equalsIgnoreCase(V_GAUSS_MUTATION))
-            mutType = mutationType[index] = C_GAUSS_MUTATION;
-        else if (mtype.equalsIgnoreCase(V_INTEGER_RESET_MUTATION))      
+        protected void loadParametersForGeneNoSync(EvolutionState state, int index, Parameter base, Parameter def, String postfix, ParameterDatabase parameters)
+        {
+            super.loadParametersForGene(state, index, base, def, postfix);
+
+            double minVal = parameters.getDoubleWithDefault(base.push(P_MINGENE).push(postfix), def.push(P_MINGENE).push(postfix), Double.NaN);
+            if (minVal == minVal)  // it's not NaN
             {
-            mutType = mutationType[index] = C_INTEGER_RESET_MUTATION;
-            state.output.warnOnce("Integer Reset Mutation used in FloatVectorSpecies.  Be advised that during initialization these genes will only be set to integer values.");
+                //check if the value is in range
+                if (!inNumericalTypeRange(minVal))
+                    state.output.fatal("Min Gene Value out of range for data type " + i_prototype.getClass().getName(),
+                            base.push(P_MINGENE).push(postfix),
+                            base.push(P_MINGENE).push(postfix));
+                else minGene[index] = minVal;
+
+                if (dynamicInitialSize)
+                    state.output.warnOnce("Using dynamic initial sizing, but per-gene or per-segment min-gene declarations.  This is probably wrong.  You probably want to use global min/max declarations.",
+                            base.push(P_MINGENE).push(postfix),
+                            base.push(P_MINGENE).push(postfix));
             }
-        else if (mtype.equalsIgnoreCase(V_INTEGER_RANDOM_WALK_MUTATION))
+
+            double maxVal = parameters.getDoubleWithDefault(base.push(P_MAXGENE).push(postfix), def.push(P_MAXGENE).push(postfix), Double.NaN);
+            if (maxVal == maxVal)  // it's not NaN
             {
-            mutType = mutationType[index] = C_INTEGER_RANDOM_WALK_MUTATION;
-            state.output.warnOnce("Integer Random Walk Mutation used in FloatVectorSpecies.  Be advised that during initialization these genes will only be set to integer values.");
+                //check if the value is in range
+                if (!inNumericalTypeRange(maxVal))
+                    state.output.fatal("Max Gene Value out of range for data type " + i_prototype.getClass().getName(),
+                            base.push(P_MAXGENE).push(postfix),
+                            base.push(P_MAXGENE).push(postfix));
+                else maxGene[index] = maxVal;
+
+                if (dynamicInitialSize)
+                    state.output.warnOnce("Using dynamic initial sizing, but per-gene or per-segment max-gene declarations.  This is probably wrong.  You probably want to use global min/max declarations.",
+                            base.push(P_MAXGENE).push(postfix),
+                            base.push(P_MAXGENE).push(postfix));
             }
-        else
-            state.output.fatal("FloatVectorSpecies given a bad mutation type: " + mtype, 
-                base.push(P_MUTATIONTYPE).push(postfix), def.push(P_MUTATIONTYPE).push(postfix));
+
+            if ((maxVal == maxVal && !(minVal == minVal)))
+                state.output.warning("Max Gene specified but not Min Gene", base.push(P_MINGENE).push(postfix), def.push(P_MINGENE).push(postfix));
+
+            if ((minVal == minVal && !(maxVal == maxVal)))
+                state.output.warning("Min Gene specified but not Max Gene", base.push(P_MAXGENE).push(postfix), def.push(P_MINGENE).push(postfix));
 
 
-        if (mutType == C_POLYNOMIAL_MUTATION)
+            /// MUTATION
+
+            String mtype = parameters.getStringWithDefault(base.push(P_MUTATIONTYPE).push(postfix), def.push(P_MUTATIONTYPE).push(postfix), null);
+            int mutType = -1;
+            if (mtype == null) { }  // we're cool
+            else if (mtype.equalsIgnoreCase(V_RESET_MUTATION))
+                mutType = mutationType[index] = C_RESET_MUTATION;
+            else if (mtype.equalsIgnoreCase(V_POLYNOMIAL_MUTATION))
+                mutType = mutationType[index] = C_POLYNOMIAL_MUTATION;
+            else if (mtype.equalsIgnoreCase(V_GAUSS_MUTATION))
+                mutType = mutationType[index] = C_GAUSS_MUTATION;
+            else if (mtype.equalsIgnoreCase(V_INTEGER_RESET_MUTATION))
             {
-            if (state.parameters.exists(base.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), def.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix)))
-                {
-                mutationDistributionIndex[index] = state.parameters.getInt(base.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), def.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), 0);
-                if (mutationDistributionIndex[index] < 0)
-                    state.output.fatal("If FloatVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, the global distribution index must be defined and >= 0.",
-                        base.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), def.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix));
-                }
-            else if (mutationDistributionIndex[index] != mutationDistributionIndex[index])  // it's NaN
-                state.output.fatal("If FloatVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, either the global or per-gene/per-segment distribution index must be defined and >= 0.",
-                    base.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), def.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix));
-            
-            if (state.parameters.exists(base.push(P_POLYNOMIAL_ALTERNATIVE).push(postfix), def.push(P_POLYNOMIAL_ALTERNATIVE).push(postfix)))
-                {
-                polynomialIsAlternative[index] = state.parameters.getBoolean(base.push(P_POLYNOMIAL_ALTERNATIVE).push(postfix), def.push(P_POLYNOMIAL_ALTERNATIVE).push(postfix), true);
-                }
+                mutType = mutationType[index] = C_INTEGER_RESET_MUTATION;
+                state.output.warnOnce("Integer Reset Mutation used in FloatVectorSpecies.  Be advised that during initialization these genes will only be set to integer values.");
             }
-        if (mutType == C_GAUSS_MUTATION)
+            else if (mtype.equalsIgnoreCase(V_INTEGER_RANDOM_WALK_MUTATION))
             {
-            if (state.parameters.exists(base.push(P_STDEV).push(postfix),def.push(P_STDEV).push(postfix)))
-                {
-                gaussMutationStdev[index] = state.parameters.getDouble(base.push(P_STDEV).push(postfix),def.push(P_STDEV).push(postfix), 0);
-                if (gaussMutationStdev[index] <= 0)
-                    state.output.fatal("If it's going to use gaussian mutation as a per-gene or per-segment type, it must have a strictly positive standard deviation",
-                        base.push(P_STDEV).push(postfix), def.push(P_STDEV).push(postfix));
-                }
-            else if (gaussMutationStdev[index] != gaussMutationStdev[index])
-                state.output.fatal("If FloatVectorSpecies is going to use gaussian mutation as a per-gene or per-segment type, either the global or per-gene/per-segment standard deviation must be defined.",
-                    base.push(P_STDEV).push(postfix), def.push(P_STDEV).push(postfix));
+                mutType = mutationType[index] = C_INTEGER_RANDOM_WALK_MUTATION;
+                state.output.warnOnce("Integer Random Walk Mutation used in FloatVectorSpecies.  Be advised that during initialization these genes will only be set to integer values.");
             }
-        if (mutType == C_INTEGER_RANDOM_WALK_MUTATION)
-            {
-            if (state.parameters.exists(base.push(P_RANDOM_WALK_PROBABILITY).push(postfix),def.push(P_RANDOM_WALK_PROBABILITY).push(postfix)))
-                {
-                randomWalkProbability[index] = state.parameters.getDoubleWithMax(base.push(P_RANDOM_WALK_PROBABILITY).push(postfix),def.push(P_RANDOM_WALK_PROBABILITY).push(postfix), 0.0, 1.0);
-                if (randomWalkProbability[index] <= 0)
-                    state.output.fatal("If it's going to use random walk mutation as a per-gene or per-segment type, FloatVectorSpecies must a random walk mutation probability between 0.0 and 1.0.",
-                        base.push(P_RANDOM_WALK_PROBABILITY).push(postfix), def.push(P_RANDOM_WALK_PROBABILITY).push(postfix));
-                }
             else
-                state.output.fatal("If FloatVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, either the global or per-gene/per-segment random walk mutation probability must be defined.",
-                    base.push(P_RANDOM_WALK_PROBABILITY).push(postfix), def.push(P_RANDOM_WALK_PROBABILITY).push(postfix));
-            }  
-        
-        if (mutType == C_POLYNOMIAL_MUTATION ||
-            mutType == C_GAUSS_MUTATION ||
-            mutType == C_INTEGER_RANDOM_WALK_MUTATION)
+                state.output.fatal("FloatVectorSpecies given a bad mutation type: " + mtype,
+                        base.push(P_MUTATIONTYPE).push(postfix), def.push(P_MUTATIONTYPE).push(postfix));
+
+
+            if (mutType == C_POLYNOMIAL_MUTATION)
             {
-            if (state.parameters.exists(base.push(P_MUTATION_BOUNDED).push(postfix), def.push(P_MUTATION_BOUNDED).push(postfix)))
+                if (parameters.exists(base.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), def.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix)))
                 {
-                mutationIsBounded[index] = state.parameters.getBoolean(base.push(P_MUTATION_BOUNDED).push(postfix), def.push(P_MUTATION_BOUNDED).push(postfix), true);
+                    mutationDistributionIndex[index] = parameters.getInt(base.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), def.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), 0);
+                    if (mutationDistributionIndex[index] < 0)
+                        state.output.fatal("If FloatVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, the global distribution index must be defined and >= 0.",
+                                base.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), def.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix));
                 }
-            else if (!mutationIsBoundedDefined)
-                state.output.fatal("If FloatVectorSpecies is going to use gaussian, polynomial, or integer random walk mutation as a per-gene or per-segment type, the mutation bounding must be defined.",
-                    base.push(P_MUTATION_BOUNDED).push(postfix), def.push(P_MUTATION_BOUNDED).push(postfix));
+                else if (mutationDistributionIndex[index] != mutationDistributionIndex[index])  // it's NaN
+                    state.output.fatal("If FloatVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, either the global or per-gene/per-segment distribution index must be defined and >= 0.",
+                            base.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix), def.push(P_MUTATION_DISTRIBUTION_INDEX).push(postfix));
+
+                if (parameters.exists(base.push(P_POLYNOMIAL_ALTERNATIVE).push(postfix), def.push(P_POLYNOMIAL_ALTERNATIVE).push(postfix)))
+                {
+                    polynomialIsAlternative[index] = parameters.getBoolean(base.push(P_POLYNOMIAL_ALTERNATIVE).push(postfix), def.push(P_POLYNOMIAL_ALTERNATIVE).push(postfix), true);
+                }
             }
-         
+            if (mutType == C_GAUSS_MUTATION)
+            {
+                if (parameters.exists(base.push(P_STDEV).push(postfix),def.push(P_STDEV).push(postfix)))
+                {
+                    gaussMutationStdev[index] = parameters.getDouble(base.push(P_STDEV).push(postfix),def.push(P_STDEV).push(postfix), 0);
+                    if (gaussMutationStdev[index] <= 0)
+                        state.output.fatal("If it's going to use gaussian mutation as a per-gene or per-segment type, it must have a strictly positive standard deviation",
+                                base.push(P_STDEV).push(postfix), def.push(P_STDEV).push(postfix));
+                }
+                else if (gaussMutationStdev[index] != gaussMutationStdev[index])
+                    state.output.fatal("If FloatVectorSpecies is going to use gaussian mutation as a per-gene or per-segment type, either the global or per-gene/per-segment standard deviation must be defined.",
+                            base.push(P_STDEV).push(postfix), def.push(P_STDEV).push(postfix));
+            }
+            if (mutType == C_INTEGER_RANDOM_WALK_MUTATION)
+            {
+                if (parameters.exists(base.push(P_RANDOM_WALK_PROBABILITY).push(postfix),def.push(P_RANDOM_WALK_PROBABILITY).push(postfix)))
+                {
+                    randomWalkProbability[index] = parameters.getDoubleWithMax(base.push(P_RANDOM_WALK_PROBABILITY).push(postfix),def.push(P_RANDOM_WALK_PROBABILITY).push(postfix), 0.0, 1.0);
+                    if (randomWalkProbability[index] <= 0)
+                        state.output.fatal("If it's going to use random walk mutation as a per-gene or per-segment type, FloatVectorSpecies must a random walk mutation probability between 0.0 and 1.0.",
+                                base.push(P_RANDOM_WALK_PROBABILITY).push(postfix), def.push(P_RANDOM_WALK_PROBABILITY).push(postfix));
+                }
+                else
+                    state.output.fatal("If FloatVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, either the global or per-gene/per-segment random walk mutation probability must be defined.",
+                            base.push(P_RANDOM_WALK_PROBABILITY).push(postfix), def.push(P_RANDOM_WALK_PROBABILITY).push(postfix));
+            }
+
+            if (mutType == C_POLYNOMIAL_MUTATION ||
+                    mutType == C_GAUSS_MUTATION ||
+                    mutType == C_INTEGER_RANDOM_WALK_MUTATION)
+            {
+                if (parameters.exists(base.push(P_MUTATION_BOUNDED).push(postfix), def.push(P_MUTATION_BOUNDED).push(postfix)))
+                {
+                    mutationIsBounded[index] = parameters.getBoolean(base.push(P_MUTATION_BOUNDED).push(postfix), def.push(P_MUTATION_BOUNDED).push(postfix), true);
+                }
+                else if (!mutationIsBoundedDefined)
+                    state.output.fatal("If FloatVectorSpecies is going to use gaussian, polynomial, or integer random walk mutation as a per-gene or per-segment type, the mutation bounding must be defined.",
+                            base.push(P_MUTATION_BOUNDED).push(postfix), def.push(P_MUTATION_BOUNDED).push(postfix));
+            }
+
         }
     
         
