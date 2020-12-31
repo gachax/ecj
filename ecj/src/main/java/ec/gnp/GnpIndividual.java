@@ -182,9 +182,9 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @return LinkedHashMap<Integer, GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
     public Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> evaluateLearnExplore(EvolutionState state,
-                                                                    int thread,
-                                                                    Double exploringProbability,
-                                                                    Object ... additionalParameters){
+                                                                                                int thread,
+                                                                                                Double exploringProbability,
+                                                                                                Object ... additionalParameters){
         return evaluate(state, thread, true, true, exploringProbability, additionalParameters);
     }
 
@@ -197,8 +197,8 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @return List<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
     public Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> evaluateDontLearnDontExplore(EvolutionState state,
-                                                                            int thread,
-                                                                            Object ... additionalParameters){
+                                                                                                        int thread,
+                                                                                                        Object ... additionalParameters){
         return evaluate(state, thread, false, false, null, additionalParameters);
     }
 
@@ -211,8 +211,8 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @return ObjectArrayList<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
     public Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> evaluateLearnDontExplore(EvolutionState state,
-                                                                                int thread,
-                                                                                Object ... additionalParameters){
+                                                                                                    int thread,
+                                                                                                    Object ... additionalParameters){
         return evaluate(state, thread, true, false, null, additionalParameters);
     }
 
@@ -255,11 +255,11 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
      * @return ObjectArrayList<GnpNodeEvaluationResult> which is the executionPath taken during the evaluation
      */
     private synchronized Int2ObjectOpenHashMap<ObjectArrayList<GnpNodeEvaluationResult>> evaluate(EvolutionState state,
-                                                                    int thread,
-                                                                    boolean learn,
-                                                                    boolean explore,
-                                                                    Double exploringProbability,
-                                                                    Object ... additionalParameters){
+                                                                                                  int thread,
+                                                                                                  boolean learn,
+                                                                                                  boolean explore,
+                                                                                                  Double exploringProbability,
+                                                                                                  Object ... additionalParameters){
 
         if (initialize) {
 
@@ -393,11 +393,11 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
             executionPathSb.append(", f = ");
 
             if (type == GnpNode.JUDGEMENT_NODE) {
-                executionPathSb.append(padRight(init.getFunctionLibrary().getJudgementFunction(result.getEvaluatedSubnode().getFunctionId()).getName(result.getEvaluatedSubnode().getSubnodeParameters()), 15));
+                executionPathSb.append(padRight(result.getEvaluatedSubnode().getFunction().getName(result.getEvaluatedSubnode().getSubnodeParameters()), 15));
             }
 
             if (type == GnpNode.PROCESSING_NODE) {
-                executionPathSb.append(padRight(init.getFunctionLibrary().getProcessingFunction(result.getEvaluatedSubnode().getFunctionId()).getName(result.getEvaluatedSubnode().getSubnodeParameters()), 15));
+                executionPathSb.append(padRight(result.getEvaluatedSubnode().getFunction().getName(result.getEvaluatedSubnode().getSubnodeParameters()), 15));
             }
 
             executionPathSb.append(")");
@@ -466,15 +466,13 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
 
                                 if (node.getType() == GnpNode.JUDGEMENT_NODE && gIndex == subnode.getStartGene()) {
 
-                                    GnpFunction function = init.getFunctionLibrary().getJudgementFunction(subnode.getFunctionId());
-                                    sb.append(", " + function.getName(subnode.getSubnodeParameters()) + "(" + subnode.getFunctionId() + ")");
+                                    sb.append(", " + subnode.getFunction().getName(subnode.getSubnodeParameters()) + "(" + subnode.getFunction().getFunctionId() + ")");
 
                                 }
 
                                 if (node.getType() == GnpNode.PROCESSING_NODE  && gIndex == subnode.getStartGene() + 1) {
 
-                                    GnpFunction function = init.getFunctionLibrary().getProcessingFunction(subnode.getFunctionId());
-                                    sb.append(", " + function.getName(subnode.getSubnodeParameters()) + "(" + subnode.getFunctionId() + ")");
+                                    sb.append(", " + subnode.getFunction().getName(subnode.getSubnodeParameters()) + "(" + subnode.getFunction().getFunctionId() + ")");
 
                                 }
 
@@ -655,11 +653,11 @@ public class GnpIndividual extends DoubleVectorIndividual implements Serializabl
             int branchOffset = 0;
 
             if (currNode.getType() == GnpNode.JUDGEMENT_NODE) {
-                function = init.getFunctionLibrary().getJudgementFunction(subnode.getFunctionId());
+                function = subnode.getFunction();
                 branchOffset = sub * init.getFunctionLibrary().getMaxJudgementResultCount();
             }
             if (currNode.getType() == GnpNode.PROCESSING_NODE) {
-                function = init.getFunctionLibrary().getProcessingFunction(subnode.getFunctionId());
+                function = subnode.getFunction();
                 branchOffset = sub;
             }
 

@@ -224,7 +224,7 @@ public class GnpNetwork  implements Serializable {
                         subnodeQValues.put(key, subnode.getQ());
 
                         //store old subnode function id values to be reused for the re-generated network, i.e. if function changed, the default parameters are set
-                        subnodeFunctionIdValues.put(key, subnode.getFunctionId());
+                        subnodeFunctionIdValues.put(key, subnode.getFunction().getFunctionId());
 
                     }
                 }
@@ -255,7 +255,7 @@ public class GnpNetwork  implements Serializable {
 
                         subnode.addSubnodeParameter((GnpSubnodeParameter) subnodeParameter);
 
-                        int functionId = subnode.getFunctionId();
+                        int functionId = subnode.getFunction().getFunctionId();
 
                         //if function changed (or new) - call the hook
                         if (!skipFunctionChangedCall && (subnodeFunctionIdValues.isEmpty() || functionId != subnodeFunctionIdValues.get(getSubnodeAttributesMapKey(n, sub)))) {
@@ -275,7 +275,7 @@ public class GnpNetwork  implements Serializable {
 
                     if (node.getType() == GnpNode.JUDGEMENT_NODE) {
 
-                        for (int b = 0; b < init.getFunctionLibrary().getJudgementFunction(subnode.getFunctionId()).getBranchNames().size(); b++) {
+                        for (int b = 0; b < subnode.getFunction().getBranchNames().size(); b++) {
 
                             GnpBranch branch = new GnpBranch(b + (sub * init.getFunctionLibrary().getMaxJudgementResultCount()), genome, init.getBranchesGeneMap().get(init.getBranchGeneMapKey(n, b + (sub * init.getFunctionLibrary().getMaxJudgementResultCount())))[0]);
 
@@ -325,7 +325,7 @@ public class GnpNetwork  implements Serializable {
 
             //get the first available node
             for (int i = Integer.parseInt(init.getConnectionsSegmentProperites().get(GnpInitializer.P_MIN_GENE));
-            i <= Integer.parseInt(init.getConnectionsSegmentProperites().get(GnpInitializer.P_MAX_GENE)); i++) {
+                 i <= Integer.parseInt(init.getConnectionsSegmentProperites().get(GnpInitializer.P_MAX_GENE)); i++) {
                 if ((usedNodes == null || !usedNodes.contains(i)) && i != node.getId()) {
                     branch.setConnectedNodeId(i);
                     break;

@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class GnpSubnode extends GnpNetworkElement implements Serializable {
 
     public static final String P_SUB_NODE = "subNode";
-    private int functionId = -1;
+    private GnpFunction function;
     private double Q = 0.0;
     protected int nodeType;
     protected GnpNode parentNode;
@@ -26,6 +26,21 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
         this.init = ((GnpInitializer) state.initializer);
         this.Q = Q;
         this.parentNode = parentNode;
+
+        if (nodeType == GnpNode.JUDGEMENT_NODE) {
+
+            int functionId = (int) genome[startGene];
+            function = init.getFunctionLibrary().newJudgementFunctionInstance(functionId);
+
+
+        }
+
+        if (nodeType == GnpNode.PROCESSING_NODE) {
+
+            int functionId = (int) genome[startGene + 1];
+            function = init.getFunctionLibrary().newProcessingFunctionInstance(functionId);
+
+        }
 
         subnodeParameters = new ObjectArrayList<>();
 
@@ -45,26 +60,8 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
 
     }
 
-        public void addSubnodeParameter(GnpSubnodeParameter subnodeParameter) {
+    public void addSubnodeParameter(GnpSubnodeParameter subnodeParameter) {
         subnodeParameters.add(subnodeParameter);
-    }
-
-    public int getFunctionId() {
-
-        if (functionId == -1) {
-
-            if (nodeType == GnpNode.JUDGEMENT_NODE) {
-                functionId = (int) genome[startGene];
-            }
-
-            if (nodeType == GnpNode.PROCESSING_NODE) {
-                functionId = (int) genome[startGene + 1];
-            }
-
-        }
-
-        return functionId;
-
     }
 
     public ObjectArrayList<GnpSubnodeParameter> getSubnodeParameters() {
@@ -92,5 +89,9 @@ public class GnpSubnode extends GnpNetworkElement implements Serializable {
 
     public void afterSubnodeFunctionChanged() {
         //a hook to be overridden
+    }
+
+    public GnpFunction getFunction() {
+        return function;
     }
 }

@@ -376,37 +376,37 @@ public class GnpInitializer extends SimpleInitializer {
             segmentStart = n + (n * (totalNodeGeneCount-1));
             s = addSegment(state, segmentStart, s, subnodeCountSegmentProperties);
 
-                for (int sub = 0; sub < maxSubnodeCount; sub++) {
+            for (int sub = 0; sub < maxSubnodeCount; sub++) {
 
-                    int offset = (sub * (SUBNODE_GENE_COUNT + totalSubnodeParametersGeneCount)) + (n * totalNodeGeneCount);
+                int offset = (sub * (SUBNODE_GENE_COUNT + totalSubnodeParametersGeneCount)) + (n * totalNodeGeneCount);
 
-                    //subnode's first segment/gene - judgement function ID
-                    segmentStart = 1 + offset;
-                    s = addSegment(state, segmentStart, s, judgementFunctionIdSegmentProperties);
+                //subnode's first segment/gene - judgement function ID
+                segmentStart = 1 + offset;
+                s = addSegment(state, segmentStart, s, judgementFunctionIdSegmentProperties);
 
-                    //subnode's first segment/gene - processing function ID
-                    segmentStart = 2 + offset;
-                    s = addSegment(state, segmentStart, s, processingFunctionIdSegmentProperties);
+                //subnode's first segment/gene - processing function ID
+                segmentStart = 2 + offset;
+                s = addSegment(state, segmentStart, s, processingFunctionIdSegmentProperties);
 
-                    //when gene description change, then new segment
-                    GnpGeneDescriptor prevDesc = null;
-                    int geneDsc = 1;
-                    for (Map.Entry<GnpGeneDescriptor, Object> entry : subnodeParameterGeneDescriptors.entrySet()) {
+                //when gene description change, then new segment
+                GnpGeneDescriptor prevDesc = null;
+                int geneDsc = 1;
+                for (Map.Entry<GnpGeneDescriptor, Object> entry : subnodeParameterGeneDescriptors.entrySet()) {
 
-                        GnpGeneDescriptor desc = entry.getKey();
-                        
-                        if (!desc.equal(prevDesc)) {
-                            segmentStart = geneDsc + SUBNODE_GENE_COUNT + offset;
-                            s = addSegment(state, segmentStart, s, desc);
-                        }
+                    GnpGeneDescriptor desc = entry.getKey();
 
-                        prevDesc = desc;
-
-                        geneDsc++;
-
+                    if (!desc.equal(prevDesc)) {
+                        segmentStart = geneDsc + SUBNODE_GENE_COUNT + offset;
+                        s = addSegment(state, segmentStart, s, desc);
                     }
 
+                    prevDesc = desc;
+
+                    geneDsc++;
+
                 }
+
+            }
 
             segmentStart = 1 + totalSubnodesGeneCount + (n * totalNodeGeneCount);
             s = addSegment(state, segmentStart, s, connectionsSegmentProperites);
@@ -422,7 +422,7 @@ public class GnpInitializer extends SimpleInitializer {
 
     }
 
-    private int addSegment(final EvolutionState state, int segmentStart, int s, Map<String, String> segmentProperties) {
+    private int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 addSegment(final EvolutionState state, int segmentStart, int s, Map<String, String> segmentProperties) {
 
         for (Map.Entry<String, String> prop : segmentProperties.entrySet()){
             state.parameters.set(new Parameter(P_VECTOR_SPECIES_SEGMENT).push(String.valueOf(s)).push(prop.getKey()), String.valueOf(prop.getValue()));

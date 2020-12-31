@@ -49,6 +49,11 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
         if (genome != null) {
 
             localGenome = new double[genes.size()];
+            /*
+            for (int i = 0; i < genes.size(); i++){
+                localGenome[i] = genome[startGene + i];
+            }
+            */
             System.arraycopy(genome, startGene, localGenome, 0, genes.size());
 
         }
@@ -63,8 +68,13 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
         newObj.genome = genome;
         newObj.startGene = startGene;
         newObj.state = state;
+        //newObj.genes = new Object2IntLinkedOpenHashMap<>();
         newObj.genes = genes;
         newObj.setupLocalGenome();
+
+        /*for (Object2IntLinkedOpenHashMap.Entry entry : genes.object2IntEntrySet()) {
+            newObj.genes.put(((GnpGeneDescriptor) entry.getKey()).copy(), entry.getIntValue());
+        }*/
 
         return newObj;
 
@@ -115,6 +125,7 @@ public abstract class GnpSubnodeParameter extends GnpNetworkElement implements S
     protected void addGene(GnpGeneDescriptor gnpGeneDescriptor){
 
         int id = genes.size();
+        //gnpGeneDescriptor.setId(id);
         genes.put(gnpGeneDescriptor, id);
 
     }

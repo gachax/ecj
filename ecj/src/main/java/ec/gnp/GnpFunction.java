@@ -13,7 +13,9 @@ import java.util.Map;
  *
  * @author Gatis Birkens
  */
-public abstract class GnpFunction {
+public abstract class GnpFunction implements Cloneable {
+
+    private int functionId;
 
     private Object2IntOpenHashMap<String> branchNames = new Object2IntOpenHashMap<>();
 
@@ -35,11 +37,11 @@ public abstract class GnpFunction {
      * @return GnpFunctionResult
      */
     public abstract GnpFunctionResult evaluate(final EvolutionState state,
-                                                  final int thread,
-                                                  final GnpIndividual individual,
-                                                  final int evaluationId,
-                                                  final ObjectArrayList<GnpSubnodeParameter> parameters,
-                                                  Object ... additionalParameters);
+                                               final int thread,
+                                               final GnpIndividual individual,
+                                               final int evaluationId,
+                                               final ObjectArrayList<GnpSubnodeParameter> parameters,
+                                               Object ... additionalParameters);
 
     /**
      * Define if the reward from executing the function is expected or not.
@@ -75,6 +77,10 @@ public abstract class GnpFunction {
         return branchNames;
     }
 
+    public void setBranchNames(Object2IntOpenHashMap<String> branchNames) {
+        this.branchNames = branchNames;
+    }
+
     public String getBranchName(int branchId) {
 
         String branchName = null;
@@ -90,6 +96,27 @@ public abstract class GnpFunction {
 
     }
 
+    public GnpFunction lightClone(){
 
+        try {
 
+            GnpFunction newFunction = (GnpFunction) this.clone();
+            newFunction.setBranchNames(new Object2IntOpenHashMap<>());
+            return newFunction;
+
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    public int getFunctionId() {
+        return functionId;
+    }
+
+    public void setFunctionId(int functionId) {
+        this.functionId = functionId;
+    }
 }

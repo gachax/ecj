@@ -40,12 +40,8 @@ public class GnpEgreedy implements GnpSubnodeSelector{
             eGreedyEpsilonL = eGreedyEpsilon;
         }
 
-        if (!exploringEnabled) {
-            eGreedyEpsilonL = 0;
-        }
-
         //if(state.random[thread].nextDouble() < 1 - eGreedyEpsilonL) {
-        if(((GnpInitializer)state.initializer).getRandomGenerators().nextDouble(thread) < 1 - eGreedyEpsilonL) {
+        if(!exploringEnabled || ((GnpInitializer)state.initializer).getRandomGenerators().nextDouble(thread) < 1 - eGreedyEpsilonL) {
 
             if (maxQValuedSubnode != null) {
 

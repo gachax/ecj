@@ -137,7 +137,7 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
         int branchOffset = 0;
         if (type == JUDGEMENT_NODE) {
 
-            function = init.getFunctionLibrary().getJudgementFunction(subnode.getFunctionId());
+            function = subnode.getFunction();
             branchOffset = subnode.getId() * init.getFunctionLibrary().getMaxJudgementResultCount();
 
             if (learn && function instanceof GnpDelayedRewardFunction && function.rewardExpected()) {
@@ -149,7 +149,7 @@ public class GnpNode extends GnpNetworkElement implements Serializable {
 
         } else if (type == PROCESSING_NODE) {
 
-            function = init.getFunctionLibrary().getProcessingFunction(subnode.getFunctionId());
+            function = subnode.getFunction();
             branchOffset = subnode.getId();
 
             if (learn && function instanceof GnpDelayedRewardFunction && function.rewardExpected()) {

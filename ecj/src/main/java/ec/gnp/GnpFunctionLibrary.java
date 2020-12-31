@@ -2,6 +2,7 @@ package ec.gnp;
 
 import ec.EvolutionState;
 import ec.util.Parameter;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class GnpFunctionLibrary implements Serializable {
             function.setup();
             maxJudgementResultCount = Math.max(function.getBranchNames().size(), maxJudgementResultCount);
             judgementFunctions.add(function);
+            function.setBranchNames(new Object2IntOpenHashMap<>());
 
         }
 
@@ -36,19 +38,28 @@ public class GnpFunctionLibrary implements Serializable {
         for (int i = 0; i < ((GnpInitializer)state.initializer).getProcessingFunctionCount(); i++) {
 
             GnpFunction function = (GnpFunction) state.parameters.getInstanceForParameter(base.push(GnpInitializer.P_PROCESSING_FUNCTION).push(String.valueOf(i)), null, GnpFunction.class);
-            function.setup();
             processingFunctions.add(function);
 
         }
 
     }
 
-    public GnpFunction getJudgementFunction(int functionId) {
-        return judgementFunctions.get(functionId);
+    public GnpFunction newJudgementFunctionInstance(int functionId) {
+
+        GnpFunction function = judgementFunctions.get(functionId).lightClone();
+        function.setFunctionId(functionId);
+        function.setup();
+
+        return function;
     }
 
-    public GnpFunction getProcessingFunction(int funcitonId) {
-        return processingFunctions.get(funcitonId);
+    public GnpFunction newProcessingFunctionInstance(int functionId) {
+
+        GnpFunction function = processingFunctions.get(functionId).lightClone();
+        function.setFunctionId(functionId);
+        function.setup();
+
+        return function;
     }
 
     int getMaxJudgementResultCount() {
